@@ -19,45 +19,45 @@ import { getSavedMemes, deleteMeme, incrementMemeViewCount, resetMemeViewCount }
 import { CustomButton } from '../components/CustomButton';
 import { adManager } from '../utils/adManager';
 
-const { width } = Dimensions.get('window');
+const { width } = Dimensions.get('window'); }
 const ITEM_WIDTH = (width - 48) / 2;
 
 const GalleryScreen: React.FC = () => {
-  const [memes, setMemes] = useState<SavedMeme[]>([]);
-  const [selectedMeme, setSelectedMeme] = useState<SavedMeme | null>(null);
-  const [modalVisible, setModalVisible] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
+  const [memes, setMemes] = useState<SavedMeme[]>([]); }
+  const [selectedMeme, setSelectedMeme] = useState<SavedMeme | null>(null); }
+  const [modalVisible, setModalVisible] = useState(false); }
+  const [isLoading, setIsLoading] = useState(true); }
 
   const loadMemes = async () => {
     try {
-      setIsLoading(true);
-      const savedMemes = await getSavedMemes();
-      setMemes(savedMemes);
+      setIsLoading(true); }
+      const savedMemes = await getSavedMemes(); }
+      setMemes(savedMemes); }
     } catch (error) {
-      console.error('Error loading memes:', error);
-      Alert.alert('Error', 'Failed to load your memes');
+      if (__DEV__) { console.error('Error loading memes:', error); }
+      Alert.alert('Error', 'Failed to load your memes'); }
     } finally {
-      setIsLoading(false);
+      setIsLoading(false); }
     }
   };
 
   useFocusEffect(
     useCallback(() => {
-      loadMemes();
+      loadMemes(); }
     }, [])
-  );
+  ); }
 
   const handleMemePress = async (meme: SavedMeme) => {
-    setSelectedMeme(meme);
-    setModalVisible(true);
+    setSelectedMeme(meme); }
+    setModalVisible(true); }
 
     // Track view count and show interstitial ad after every 3 views
-    const viewCount = await incrementMemeViewCount();
+    const viewCount = await incrementMemeViewCount(); }
     if (viewCount % 3 === 0) {
       setTimeout(() => {
-        adManager.showInterstitialAd();
-        resetMemeViewCount();
-      }, 1000);
+        adManager.showInterstitialAd(); }
+        resetMemeViewCount(); }
+      }, 1000); }
     }
   };
 
@@ -72,40 +72,40 @@ const GalleryScreen: React.FC = () => {
           style: 'destructive',
           onPress: async () => {
             try {
-              await deleteMeme(meme.id);
-              await loadMemes();
-              setModalVisible(false);
-              Alert.alert('Success', 'Meme deleted successfully');
+              await deleteMeme(meme.id); }
+              await loadMemes(); }
+              setModalVisible(false); }
+              Alert.alert('Success', 'Meme deleted successfully'); }
             } catch (error) {
-              console.error('Error deleting meme:', error);
-              Alert.alert('Error', 'Failed to delete meme');
+              if (__DEV__) { console.error('Error deleting meme:', error); }
+              Alert.alert('Error', 'Failed to delete meme'); }
             }
           },
         },
       ]
-    );
+    ); }
   };
 
   const handleShareMeme = async (meme: SavedMeme) => {
     try {
-      const isAvailable = await Sharing.isAvailableAsync();
+      const isAvailable = await Sharing.isAvailableAsync(); }
       if (!isAvailable) {
-        Alert.alert('Error', 'Sharing is not available on this device');
+        Alert.alert('Error', 'Sharing is not available on this device'); }
         return;
       }
 
       await Sharing.shareAsync(meme.uri, {
         mimeType: 'image/jpeg',
         dialogTitle: 'Share your meme',
-      });
+      }); }
 
       // Show interstitial ad after sharing
       setTimeout(() => {
-        adManager.showInterstitialAd();
-      }, 500);
+        adManager.showInterstitialAd(); }
+      }, 500); }
     } catch (error) {
-      console.error('Error sharing meme:', error);
-      Alert.alert('Error', 'Failed to share meme');
+      if (__DEV__) { console.error('Error sharing meme:', error); }
+      Alert.alert('Error', 'Failed to share meme'); }
     }
   };
 
@@ -117,7 +117,7 @@ const GalleryScreen: React.FC = () => {
     >
       <Image source={{ uri: item.uri }} style={styles.memeImage} resizeMode="cover" />
     </TouchableOpacity>
-  );
+  ); }
 
   const renderEmptyState = () => (
     <View style={styles.emptyState}>
@@ -127,7 +127,7 @@ const GalleryScreen: React.FC = () => {
         Create your first meme and it will appear here
       </Text>
     </View>
-  );
+  ); }
 
   return (
     <View style={styles.container}>
@@ -196,7 +196,7 @@ const GalleryScreen: React.FC = () => {
         </View>
       </Modal>
     </View>
-  );
+  ); }
 };
 
 const styles = StyleSheet.create({
@@ -290,6 +290,6 @@ const styles = StyleSheet.create({
   modalButton: {
     flex: 1,
   },
-});
+}); }
 
 export default GalleryScreen;

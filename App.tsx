@@ -28,7 +28,9 @@ export default function App() {
       // App is ready
       setIsReady(true);
     } catch (error) {
-      console.error('Error initializing app:', error);
+      if (__DEV__) {
+        console.error('Error initializing app:', error);
+      }
       // Still set ready to true to show the app
       setIsReady(true);
     }
