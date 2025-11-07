@@ -5,6 +5,7 @@ export interface MemeTemplate {
   category: string;
   width: number;
   height: number;
+  suggestions?: string[];
 }
 
 export interface MemeText {

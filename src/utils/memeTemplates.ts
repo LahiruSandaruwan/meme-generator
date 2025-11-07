@@ -33,7 +33,7 @@ export const memeTemplates: MemeTemplate[] = [
     category: 'Trending',
     width: 680,
     height: 438,
-    suggestions: ['You can\\'t', 'I can'],
+    suggestions: ["You can't", 'I can'],
   },
   {
     id: '217743513',
@@ -78,7 +78,7 @@ export const memeTemplates: MemeTemplate[] = [
     category: 'Trending',
     width: 960,
     height: 540,
-    suggestions: ['Wait, it\\'s all...', 'Always has been'],
+    suggestions: ["Wait, it's all...", 'Always has been'],
   },
   {
     id: '178591752',
@@ -100,7 +100,7 @@ export const memeTemplates: MemeTemplate[] = [
   },
   {
     id: '131940431',
-    name: 'Gru\\'s Plan',
+    name: "Gru's Plan",
     url: 'https://i.imgflip.com/26jxvz.jpg',
     category: 'Trending',
     width: 700,
@@ -109,16 +109,16 @@ export const memeTemplates: MemeTemplate[] = [
   },
   {
     id: '232936670',
-    name: 'They\\'re The Same Picture',
+    name: "They're The Same Picture",
     url: 'https://i.imgflip.com/3vqyd3.jpg',
     category: 'Trending',
     width: 1440,
     height: 1136,
-    suggestions: ['Corporate wants you to find the differences', 'They\\'re the same picture'],
+    suggestions: ['Corporate wants you to find the differences', "They're the same picture"],
   },
   {
     id: '322841258',
-    name: 'I Bet He\\'s Thinking About Other Women',
+    name: "I Bet He's Thinking About Other Women",
     url: 'https://i.imgflip.com/5c7lwq.jpg',
     category: 'Trending',
     width: 1654,
@@ -305,7 +305,7 @@ export const memeTemplates: MemeTemplate[] = [
     category: 'Classic',
     width: 550,
     height: 690,
-    suggestions: ['I don\\'t always', 'But when I do'],
+    suggestions: ["I don't always", 'But when I do'],
   },
   {
     id: '101287',
@@ -314,7 +314,7 @@ export const memeTemplates: MemeTemplate[] = [
     category: 'Classic',
     width: 426,
     height: 426,
-    suggestions: ['So you\\'re telling me'],
+    suggestions: ["So you're telling me"],
   },
   {
     id: '563423',
@@ -341,7 +341,7 @@ export const memeTemplates: MemeTemplate[] = [
     category: 'Classic',
     width: 702,
     height: 395,
-    suggestions: ['Can\\'t have problem', 'If you don\\'t do thing'],
+    suggestions: ["Can't have problem", "If you don't do thing"],
   },
   {
     id: '6235864',
@@ -431,7 +431,7 @@ export const memeTemplates: MemeTemplate[] = [
     category: 'Classic',
     width: 526,
     height: 440,
-    suggestions: ['Yeah if you could', 'That\\'d be great'],
+    suggestions: ['Yeah if you could', "That'd be great"],
   },
   {
     id: '101288',
@@ -453,7 +453,7 @@ export const memeTemplates: MemeTemplate[] = [
   },
   {
     id: '101511',
-    name: 'Don\\'t You Squidward',
+    name: "Don't You Squidward",
     url: 'https://i.imgflip.com/26br.jpg',
     category: 'Classic',
     width: 500,
@@ -485,7 +485,7 @@ export const memeTemplates: MemeTemplate[] = [
     category: 'Classic',
     width: 1366,
     height: 768,
-    suggestions: ['I\\'m not leaving!'],
+    suggestions: ["I'm not leaving!"],
   },
   {
     id: '61527',
@@ -649,7 +649,7 @@ export const memeTemplates: MemeTemplate[] = [
     category: 'Reaction',
     width: 640,
     height: 631,
-    suggestions: ['Can\\'t sleep about problem'],
+    suggestions: ["Can't sleep about problem"],
   },
   {
     id: '4087833',
@@ -873,7 +873,7 @@ export const memeTemplates: MemeTemplate[] = [
   },
   {
     id: '232936670',
-    name: 'They\\'re The Same Picture',
+    name: "They're The Same Picture",
     url: 'https://i.imgflip.com/3vqyd3.jpg',
     category: 'Office',
     width: 1440,
@@ -882,16 +882,16 @@ export const memeTemplates: MemeTemplate[] = [
   },
   {
     id: '199441956',
-    name: 'Sir This Is An Arby\\'s',
+    name: "Sir This Is An Arby's",
     url: 'https://i.imgflip.com/39w4qe.jpg',
     category: 'Office',
     width: 1280,
     height: 720,
-    suggestions: ['Long complaint', 'Sir this is an Arby\\'s'],
+    suggestions: ['Long complaint', "Sir this is an Arby's"],
   },
   {
     id: '3218037',
-    name: 'This Is Where I\\'d Put My Trophy',
+    name: "This Is Where I'd Put My Trophy",
     url: 'https://i.imgflip.com/1wz1v.jpg',
     category: 'Office',
     width: 640,
@@ -905,16 +905,16 @@ export const memeTemplates: MemeTemplate[] = [
     category: 'Office',
     width: 702,
     height: 395,
-    suggestions: ['Can\\'t have problems', 'If you avoid them'],
+    suggestions: ["Can't have problems", 'If you avoid them'],
   },
   {
     id: '124055727',
-    name: 'Y\\'all Got Any More Of That',
+    name: "Y'all Got Any More Of That",
     url: 'https://i.imgflip.com/21uy0f.jpg',
     category: 'Office',
     width: 600,
     height: 471,
-    suggestions: ['Y\\'all got any more of'],
+    suggestions: ["Y'all got any more of"],
   },
   {
     id: '21604248',
@@ -1046,7 +1046,7 @@ export const memeTemplates: MemeTemplate[] = [
   },
   {
     id: '131940431',
-    name: 'Gru\\'s Plan',
+    name: "Gru's Plan",
     url: 'https://i.imgflip.com/26jxvz.jpg',
     category: 'Gaming',
     width: 700,
@@ -1071,7 +1071,7 @@ export const memeTemplates: MemeTemplate[] = [
     category: 'Movies',
     width: 960,
     height: 540,
-    suggestions: ['Wait it\\'s all', 'Always has been'],
+    suggestions: ["Wait it's all", 'Always has been'],
   },
   {
     id: '196652226',
@@ -1102,7 +1102,7 @@ export const memeTemplates: MemeTemplate[] = [
   },
   {
     id: '101511',
-    name: 'Don\\'t You Squidward',
+    name: "Don't You Squidward",
     url: 'https://i.imgflip.com/26br.jpg',
     category: 'Movies',
     width: 500,
@@ -1143,7 +1143,7 @@ export const memeTemplates: MemeTemplate[] = [
     category: 'Movies',
     width: 1366,
     height: 768,
-    suggestions: ['I\\'m not leaving!'],
+    suggestions: ["I'm not leaving!"],
   },
   {
     id: '28034788',
@@ -1203,7 +1203,7 @@ export const memeTemplates: MemeTemplate[] = [
   },
   {
     id: '322841258',
-    name: 'I Bet He\\'s Thinking About Other Women',
+    name: "I Bet He's Thinking About Other Women",
     url: 'https://i.imgflip.com/5c7lwq.jpg',
     category: 'Relationships',
     width: 1654,
@@ -1280,7 +1280,7 @@ export const memeTemplates: MemeTemplate[] = [
     category: 'Relationships',
     width: 600,
     height: 908,
-    suggestions: ['Option 1', 'Option 2', 'Can\\'t decide'],
+    suggestions: ['Option 1', 'Option 2', "Can't decide"],
   },
 ];
 
