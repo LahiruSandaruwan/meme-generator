@@ -9,7 +9,6 @@ import {
   TouchableOpacity,
   Alert,
   Dimensions,
-  Platform,
 } from 'react-native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RouteProp } from '@react-navigation/native';
@@ -17,7 +16,7 @@ import { Ionicons } from '@expo/vector-icons';
 import * as Sharing from 'expo-sharing';
 import ViewShot from 'react-native-view-shot';
 import { colors } from '../constants/colors';
-import { RootStackParamList, MemeText } from '../types';
+import { RootStackParamList } from '../types';
 import { saveMeme } from '../utils/storage';
 import { saveImageToGallery, generateUniqueId } from '../utils/imageUtils';
 import { TEXT_CONFIG, APP_CONFIG } from '../constants/config';
@@ -25,7 +24,7 @@ import { CustomButton } from '../components/CustomButton';
 import { AdBanner } from '../components/AdBanner';
 import { adManager } from '../utils/adManager';
 
-const { width } = Dimensions.get('window'); }
+const { width } = Dimensions.get('window');
 const MEME_WIDTH = width - 32;
 
 type EditorScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'Editor'>;
@@ -38,30 +37,30 @@ type EditorScreenProps = {
 
 const EditorScreen: React.FC<EditorScreenProps> = ({ navigation, route }) => {
   const { templateUri } = route.params;
-  const viewShotRef = useRef<ViewShot>(null); }
+  const viewShotRef = useRef<ViewShot>(null);
 
-  const [topText, setTopText] = useState(''); }
-  const [bottomText, setBottomText] = useState(''); }
-  const [fontSize, setFontSize] = useState(TEXT_CONFIG.defaultFontSize); }
-  const [textColor, setTextColor] = useState(TEXT_CONFIG.defaultColor); }
-  const [showWatermark, setShowWatermark] = useState(true); }
-  const [isSaving, setIsSaving] = useState(false); }
+  const [topText, setTopText] = useState('');
+  const [bottomText, setBottomText] = useState('');
+  const [fontSize, setFontSize] = useState(TEXT_CONFIG.defaultFontSize);
+  const [textColor, setTextColor] = useState(TEXT_CONFIG.defaultColor);
+  const [showWatermark, setShowWatermark] = useState(true);
+  const [isSaving, setIsSaving] = useState(false);
 
   const textColors = ['#FFFFFF', '#000000', '#FF0000', '#FFFF00', '#00FF00', '#0000FF'];
 
   const handleSaveMeme = async () => {
     try {
-      setIsSaving(true); }
+      setIsSaving(true);
 
-      if (!viewShotRef.current) {
-        throw new Error('ViewShot ref not available'); }
+      if (!viewShotRef.current || !viewShotRef.current.capture) {
+        throw new Error('ViewShot ref not available');
       }
 
       // Capture the meme
-      const uri = await viewShotRef.current.capture(); }
+      const uri = await viewShotRef.current.capture();
 
       // Save to gallery
-      await saveImageToGallery(uri); }
+      await saveImageToGallery(uri);
 
       // Save to app storage
       const meme = {
@@ -70,7 +69,7 @@ const EditorScreen: React.FC<EditorScreenProps> = ({ navigation, route }) => {
         timestamp: Date.now(),
         templateId: route.params.templateId,
       };
-      await saveMeme(meme); }
+      await saveMeme(meme);
 
       Alert.alert(
         'Success!',
@@ -82,58 +81,58 @@ const EditorScreen: React.FC<EditorScreenProps> = ({ navigation, route }) => {
           },
           { text: 'Create Another', onPress: () => navigation.goBack() },
         ]
-      ); }
+      );
 
       // Show interstitial ad after saving
       setTimeout(() => {
-        adManager.showInterstitialAd(); }
-      }, 500); }
+        adManager.showInterstitialAd();
+      }, 500);
     } catch (error) {
       if (__DEV__) { console.error('Error saving meme:', error); }
-      Alert.alert('Error', 'Failed to save meme. Please try again.'); }
+      Alert.alert('Error', 'Failed to save meme. Please try again.');
     } finally {
-      setIsSaving(false); }
+      setIsSaving(false);
     }
   };
 
   const handleShareMeme = async () => {
     try {
-      if (!viewShotRef.current) {
-        throw new Error('ViewShot ref not available'); }
+      if (!viewShotRef.current || !viewShotRef.current.capture) {
+        throw new Error('ViewShot ref not available');
       }
 
-      const uri = await viewShotRef.current.capture(); }
+      const uri = await viewShotRef.current.capture();
 
-      const isAvailable = await Sharing.isAvailableAsync(); }
+      const isAvailable = await Sharing.isAvailableAsync();
       if (!isAvailable) {
-        Alert.alert('Error', 'Sharing is not available on this device'); }
+        Alert.alert('Error', 'Sharing is not available on this device');
         return;
       }
 
       await Sharing.shareAsync(uri, {
         mimeType: 'image/jpeg',
         dialogTitle: 'Share your meme',
-      }); }
+      });
 
       // Show interstitial ad after sharing
       setTimeout(() => {
-        adManager.showInterstitialAd(); }
-      }, 500); }
+        adManager.showInterstitialAd();
+      }, 500);
     } catch (error) {
       if (__DEV__) { console.error('Error sharing meme:', error); }
-      Alert.alert('Error', 'Failed to share meme. Please try again.'); }
+      Alert.alert('Error', 'Failed to share meme. Please try again.');
     }
   };
 
   const handleRemoveWatermark = async () => {
-    const isReady = adManager.isRewardedAdReady(); }
+    const isReady = adManager.isRewardedAdReady();
 
     if (!isReady) {
       Alert.alert(
         'Ad Not Ready',
         'The reward ad is still loading. Please try again in a moment.',
         [{ text: 'OK' }]
-      ); }
+      );
       return;
     }
 
@@ -146,17 +145,17 @@ const EditorScreen: React.FC<EditorScreenProps> = ({ navigation, route }) => {
           text: 'Watch Video',
           onPress: async () => {
             const success = await adManager.showRewardedAd(() => {
-              setShowWatermark(false); }
-              Alert.alert('Success!', 'Watermark removed!'); }
-            }); }
+              setShowWatermark(false);
+              Alert.alert('Success!', 'Watermark removed!');
+            });
 
             if (!success) {
-              Alert.alert('Error', 'Failed to load reward ad. Please try again.'); }
+              Alert.alert('Error', 'Failed to load reward ad. Please try again.');
             }
           },
         },
       ]
-    ); }
+    );
   };
 
   return (
@@ -331,7 +330,7 @@ const EditorScreen: React.FC<EditorScreenProps> = ({ navigation, route }) => {
       {/* Ad Banner */}
       <AdBanner />
     </View>
-  ); }
+  );
 };
 
 const styles = StyleSheet.create({
@@ -490,6 +489,6 @@ const styles = StyleSheet.create({
   shareButton: {
     flex: 1,
   },
-}); }
+});
 
 export default EditorScreen;

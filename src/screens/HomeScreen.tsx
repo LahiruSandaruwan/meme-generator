@@ -29,34 +29,34 @@ type HomeScreenProps = {
 };
 
 const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
-  const [searchQuery, setSearchQuery] = useState(''); }
-  const [selectedCategory, setSelectedCategory] = useState('All'); }
+  const [searchQuery, setSearchQuery] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState('All');
 
-  const categories = getCategories(); }
+  const categories = getCategories();
   const filteredTemplates = searchQuery
     ? searchTemplates(searchQuery)
     : selectedCategory === 'All'
     ? memeTemplates
-    : memeTemplates.filter((t) => t.category === selectedCategory); }
+    : memeTemplates.filter((t) => t.category === selectedCategory);
 
   const handleTemplatePress = (template: MemeTemplateType) => {
     navigation.navigate('Editor', {
       templateUri: template.url,
       templateId: template.id,
       templateName: template.name,
-    }); }
+    });
   };
 
   const handleUploadCustomImage = async () => {
     try {
-      const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync(); }
+      const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
 
       if (status !== 'granted') {
         Alert.alert(
           'Permission Required',
           'We need access to your photos to upload custom images.',
           [{ text: 'OK' }]
-        ); }
+        );
         return;
       }
 
@@ -64,45 +64,45 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
         mediaTypes: ImagePicker.MediaTypeOptions.Images,
         allowsEditing: true,
         quality: 1,
-      }); }
+      });
 
       if (!result.canceled && result.assets[0]) {
         navigation.navigate('Editor', {
           templateUri: result.assets[0].uri,
-        }); }
+        });
       }
     } catch (error) {
       if (__DEV__) { console.error('Error picking image:', error); }
-      Alert.alert('Error', 'Failed to pick image. Please try again.'); }
+      Alert.alert('Error', 'Failed to pick image. Please try again.');
     }
   };
 
   const handleTakePhoto = async () => {
     try {
-      const { status } = await ImagePicker.requestCameraPermissionsAsync(); }
+      const { status } = await ImagePicker.requestCameraPermissionsAsync();
 
       if (status !== 'granted') {
         Alert.alert(
           'Permission Required',
           'We need access to your camera to take photos.',
           [{ text: 'OK' }]
-        ); }
+        );
         return;
       }
 
       const result = await ImagePicker.launchCameraAsync({
         allowsEditing: true,
         quality: 1,
-      }); }
+      });
 
       if (!result.canceled && result.assets[0]) {
         navigation.navigate('Editor', {
           templateUri: result.assets[0].uri,
-        }); }
+        });
       }
     } catch (error) {
       if (__DEV__) { console.error('Error taking photo:', error); }
-      Alert.alert('Error', 'Failed to take photo. Please try again.'); }
+      Alert.alert('Error', 'Failed to take photo. Please try again.');
     }
   };
 
@@ -171,7 +171,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
         {filteredTemplates.length} Templates
       </Text>
     </View>
-  ); }
+  );
 
   return (
     <View style={styles.container}>
@@ -188,7 +188,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
         showsVerticalScrollIndicator={false}
       />
     </View>
-  ); }
+  );
 };
 
 const styles = StyleSheet.create({
@@ -266,6 +266,6 @@ const styles = StyleSheet.create({
   row: {
     justifyContent: 'space-between',
   },
-}); }
+});
 
 export default HomeScreen;

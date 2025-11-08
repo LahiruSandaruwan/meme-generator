@@ -45,7 +45,7 @@ const SettingItem: React.FC<SettingItemProps> = ({
       <Ionicons name="chevron-forward" size={20} color={colors.textLight} />
     )}
   </TouchableOpacity>
-); }
+);
 
 const SettingsScreen: React.FC = () => {
   const handleRateApp = () => {
@@ -58,25 +58,25 @@ const SettingsScreen: React.FC = () => {
           text: 'Rate Now',
           onPress: () => {
             // In production, replace with actual app store URL
-            Alert.alert('Thank you!', 'This would open the app store in production.'); }
+            Alert.alert('Thank you!', 'This would open the app store in production.');
           },
         },
       ]
-    ); }
+    );
   };
 
   const handleShareApp = async () => {
     try {
       const message = `Check out Meme Generator! Create hilarious memes in seconds! 🎨😂\n\n[App Store Link]`;
 
-      const isAvailable = await Sharing.isAvailableAsync(); }
+      const isAvailable = await Sharing.isAvailableAsync();
       if (isAvailable) {
         // In a real app, you'd share the actual app link
         Alert.alert(
           'Share App',
           'Share Meme Generator with your friends!',
           [{ text: 'OK' }]
-        ); }
+        );
       }
     } catch (error) {
       if (__DEV__) { console.error('Error sharing app:', error); }
@@ -92,11 +92,11 @@ const SettingsScreen: React.FC = () => {
         {
           text: 'Learn More',
           onPress: () => {
-            Linking.openURL('https://policies.google.com/privacy'); }
+            Linking.openURL('https://policies.google.com/privacy');
           },
         },
       ]
-    ); }
+    );
   };
 
   const handleClearCache = () => {
@@ -110,16 +110,16 @@ const SettingsScreen: React.FC = () => {
           style: 'destructive',
           onPress: async () => {
             try {
-              await clearAllData(); }
-              Alert.alert('Success', 'All data has been cleared'); }
+              await clearAllData();
+              Alert.alert('Success', 'All data has been cleared');
             } catch (error) {
               if (__DEV__) { console.error('Error clearing data:', error); }
-              Alert.alert('Error', 'Failed to clear data'); }
+              Alert.alert('Error', 'Failed to clear data');
             }
           },
         },
       ]
-    ); }
+    );
   };
 
   const handleContactSupport = () => {
@@ -131,11 +131,11 @@ const SettingsScreen: React.FC = () => {
         {
           text: 'Send Email',
           onPress: () => {
-            Linking.openURL('mailto:support@memegenapp.com?subject=Meme Generator Support'); }
+            Linking.openURL('mailto:support@memegenapp.com?subject=Meme Generator Support');
           },
         },
       ]
-    ); }
+    );
   };
 
   const handleAbout = () => {
@@ -143,7 +143,7 @@ const SettingsScreen: React.FC = () => {
       'About Meme Generator',
       `Version: ${APP_CONFIG.version}\n\nMeme Generator is the easiest way to create and share hilarious memes. Choose from 20+ popular templates or use your own photos!\n\nMade with ❤️ for meme lovers everywhere.`,
       [{ text: 'OK' }]
-    ); }
+    );
   };
 
   return (
@@ -230,7 +230,7 @@ const SettingsScreen: React.FC = () => {
         </View>
       </View>
     </ScrollView>
-  ); }
+  );
 };
 
 const styles = StyleSheet.create({
@@ -310,6 +310,6 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: colors.textLight,
   },
-}); }
+});
 
 export default SettingsScreen;
