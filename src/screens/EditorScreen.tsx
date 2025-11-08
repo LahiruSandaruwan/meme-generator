@@ -28,6 +28,7 @@ import { AdBanner } from '../components/AdBanner';
 import { VoiceInput } from '../components/VoiceInput';
 import { StickerPicker } from '../components/StickerPicker';
 import { FontPicker } from '../components/FontPicker';
+import { ImageFilters, ImageFilter } from '../components/ImageFilters';
 import { Sticker } from '../utils/stickerData';
 import { Font, getFontFamily } from '../utils/fontData';
 import { adManager } from '../utils/adManager';
@@ -69,6 +70,14 @@ const EditorScreen: React.FC<EditorScreenProps> = ({ navigation, route }) => {
 
   // Font picker state
   const [showFontPicker, setShowFontPicker] = useState(false);
+
+  // Image filters state
+  const [imageFilters, setImageFilters] = useState<ImageFilter>({
+    brightness: 0,
+    contrast: 0,
+    saturation: 1,
+  });
+  const [showImageFilters, setShowImageFilters] = useState(false);
 
   const textColors = ['#FFFFFF', '#000000', '#FF0000', '#FFFF00', '#00FF00', '#0000FF'];
 
@@ -218,6 +227,11 @@ const EditorScreen: React.FC<EditorScreenProps> = ({ navigation, route }) => {
     }
   }, [selectedTextId, updateTextBox]);
 
+  // Image filter management
+  const handleApplyFilters = useCallback((filters: ImageFilter) => {
+    setImageFilters(filters);
+  }, []);
+
   const handleSaveMeme = async () => {
     try {
       setIsSaving(true);
@@ -355,9 +369,31 @@ const EditorScreen: React.FC<EditorScreenProps> = ({ navigation, route }) => {
             <View style={styles.memeContainer}>
               <Image
                 source={{ uri: templateUri }}
-                style={styles.memeImage}
+                style={[
+                  styles.memeImage,
+                  {
+                    opacity: 1 + imageFilters.brightness * 0.5,
+                  },
+                ]}
                 resizeMode="contain"
               />
+
+              {/* Filter Overlay for Saturation/Contrast Effects */}
+              {(imageFilters.saturation !== 1 || imageFilters.contrast !== 0) && (
+                <View
+                  style={[
+                    styles.filterOverlay,
+                    {
+                      backgroundColor:
+                        imageFilters.saturation < 0.5
+                          ? 'rgba(128, 128, 128, ' + (1 - imageFilters.saturation) * 0.5 + ')'
+                          : 'transparent',
+                      opacity: Math.abs(imageFilters.contrast) * 0.3 + 0.7,
+                    },
+                  ]}
+                  pointerEvents="none"
+                />
+              )}
 
               {/* Draggable Text Boxes */}
               {history.present.map(textBox => (
@@ -397,7 +433,7 @@ const EditorScreen: React.FC<EditorScreenProps> = ({ navigation, route }) => {
 
         {/* Controls */}
         <View style={styles.controlsContainer}>
-          {/* Undo/Redo and Add Text */}
+          {/* Undo/Redo, Filters, and Add Buttons */}
           <View style={styles.topControls}>
             <View style={styles.undoRedoContainer}>
               <TouchableOpacity
@@ -413,6 +449,19 @@ const EditorScreen: React.FC<EditorScreenProps> = ({ navigation, route }) => {
                 style={[styles.iconButton, history.future.length === 0 && styles.iconButtonDisabled]}
               >
                 <Ionicons name="arrow-redo" size={24} color={history.future.length === 0 ? colors.textLight : colors.primary} />
+              </TouchableOpacity>
+              <TouchableOpacity
+                onPress={() => setShowImageFilters(true)}
+                style={[
+                  styles.iconButton,
+                  (imageFilters.brightness !== 0 || imageFilters.contrast !== 0 || imageFilters.saturation !== 1) && styles.filterButtonActive
+                ]}
+              >
+                <Ionicons
+                  name="color-filter"
+                  size={24}
+                  color={(imageFilters.brightness !== 0 || imageFilters.contrast !== 0 || imageFilters.saturation !== 1) ? colors.success : colors.primary}
+                />
               </TouchableOpacity>
             </View>
 
@@ -753,6 +802,14 @@ const EditorScreen: React.FC<EditorScreenProps> = ({ navigation, route }) => {
         currentFontId={selectedText?.fontFamily}
       />
 
+      {/* Image Filters Modal */}
+      <ImageFilters
+        visible={showImageFilters}
+        onClose={() => setShowImageFilters(false)}
+        onApply={handleApplyFilters}
+        currentFilters={imageFilters}
+      />
+
       {/* Ad Banner */}
       <AdBanner />
     </GestureHandlerRootView>
@@ -938,6 +995,13 @@ const styles = StyleSheet.create({
     width: '100%',
     height: '100%',
   },
+  filterOverlay: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+  },
   draggableContainer: {
     position: 'absolute',
     padding: 8,
@@ -996,6 +1060,9 @@ const styles = StyleSheet.create({
   },
   iconButtonDisabled: {
     opacity: 0.5,
+  },
+  filterButtonActive: {
+    backgroundColor: `${colors.success}20`,
   },
   addButtonsContainer: {
     flexDirection: 'row',
