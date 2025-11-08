@@ -425,7 +425,7 @@ export const memeTemplates: MemeTemplate[] = [
     suggestions: ['Discovering internet'],
   },
   {
-    id: '563423',
+    id: '563423_2',
     name: 'Bill Lumbergh',
     url: 'https://i.imgflip.com/c2qn.jpg',
     category: 'Classic',
@@ -517,7 +517,7 @@ export const memeTemplates: MemeTemplate[] = [
     suggestions: ['Unexpected thing', '*surprised*'],
   },
   {
-    id: '27813981',
+    id: '27813981_2',
     name: 'Hide The Pain Harold',
     url: 'https://i.imgflip.com/gk5el.jpg',
     category: 'Reaction',
@@ -526,7 +526,7 @@ export const memeTemplates: MemeTemplate[] = [
     suggestions: ['Painful situation', '*smiles*'],
   },
   {
-    id: '259237855',
+    id: '259237855_2',
     name: 'Laughing Leo',
     url: 'https://i.imgflip.com/4acd7j.jpg',
     category: 'Reaction',
@@ -571,7 +571,7 @@ export const memeTemplates: MemeTemplate[] = [
     suggestions: ['Person 1', 'Person 2', 'Escalating argument'],
   },
   {
-    id: '129242436',
+    id: '129242436_2',
     name: 'Change My Mind',
     url: 'https://i.imgflip.com/24y43o.jpg',
     category: 'Reaction',
@@ -589,7 +589,7 @@ export const memeTemplates: MemeTemplate[] = [
     suggestions: ['Scary thing'],
   },
   {
-    id: '101287',
+    id: '101287_2',
     name: 'Third World Skeptical Kid',
     url: 'https://i.imgflip.com/265k.jpg',
     category: 'Reaction',
@@ -607,7 +607,7 @@ export const memeTemplates: MemeTemplate[] = [
     suggestions: ['See? Nobody cares'],
   },
   {
-    id: '84341851',
+    id: '84341851_2',
     name: 'Evil Kermit',
     url: 'https://i.imgflip.com/1e7ql7.jpg',
     category: 'Reaction',
@@ -652,7 +652,7 @@ export const memeTemplates: MemeTemplate[] = [
     suggestions: ["Can't sleep about problem"],
   },
   {
-    id: '4087833',
+    id: '4087833_2',
     name: 'Waiting Skeleton',
     url: 'https://i.imgflip.com/2fm6x.jpg',
     category: 'Reaction',
@@ -679,7 +679,7 @@ export const memeTemplates: MemeTemplate[] = [
     suggestions: ['Unsettling fact'],
   },
   {
-    id: '178591752',
+    id: '178591752_2',
     name: 'Tuxedo Winnie The Pooh',
     url: 'https://i.imgflip.com/2ybua0.jpg',
     category: 'Reaction',
@@ -699,7 +699,7 @@ export const memeTemplates: MemeTemplate[] = [
     suggestions: ['No'],
   },
   {
-    id: '8072285',
+    id: '8072285_2',
     name: 'Doge',
     url: 'https://i.imgflip.com/4t0m5.jpg',
     category: 'Animals',
@@ -708,7 +708,7 @@ export const memeTemplates: MemeTemplate[] = [
     suggestions: ['Much', 'Very', 'Such', 'Wow'],
   },
   {
-    id: '155067746',
+    id: '155067746_2',
     name: 'Surprised Pikachu',
     url: 'https://i.imgflip.com/2ka1vv.jpg',
     category: 'Animals',
@@ -717,7 +717,7 @@ export const memeTemplates: MemeTemplate[] = [
     suggestions: ['*surprised pikachu face*'],
   },
   {
-    id: '247375501',
+    id: '247375501_2',
     name: 'Buff Doge vs Cheems',
     url: 'https://i.imgflip.com/43a45p.jpg',
     category: 'Animals',
@@ -726,7 +726,7 @@ export const memeTemplates: MemeTemplate[] = [
     suggestions: ['Then', 'Now', 'Strong', 'Weak'],
   },
   {
-    id: '188390779',
+    id: '188390779_2',
     name: 'Woman Yelling At A Cat',
     url: 'https://i.imgflip.com/345v97.jpg',
     category: 'Animals',
@@ -735,7 +735,7 @@ export const memeTemplates: MemeTemplate[] = [
     suggestions: ['Angry complaint', 'Calm rejection'],
   },
   {
-    id: '4173692',
+    id: '4173692_2',
     name: 'Scared Cat',
     url: 'https://i.imgflip.com/2hgfw.jpg',
     category: 'Animals',
@@ -762,7 +762,7 @@ export const memeTemplates: MemeTemplate[] = [
     suggestions: ['I should buy a...'],
   },
   {
-    id: '61520',
+    id: '61520_2',
     name: 'Success Kid',
     url: 'https://i.imgflip.com/1bhk.jpg',
     category: 'Animals',
@@ -816,7 +816,7 @@ export const memeTemplates: MemeTemplate[] = [
     suggestions: ['Annoyed'],
   },
   {
-    id: '84341851',
+    id: '84341851_3',
     name: 'Evil Kermit',
     url: 'https://i.imgflip.com/1e7ql7.jpg',
     category: 'Animals',
@@ -827,7 +827,7 @@ export const memeTemplates: MemeTemplate[] = [
 
   // OFFICE/WORK (15 templates)
   {
-    id: '563423',
+    id: '563423_3',
     name: 'That Would Be Great',
     url: 'https://i.imgflip.com/c2qn.jpg',
     category: 'Office',
@@ -836,7 +836,7 @@ export const memeTemplates: MemeTemplate[] = [
     suggestions: ['If you could', 'That would be great'],
   },
   {
-    id: '135256802',
+    id: '135256802_2',
     name: 'Epic Handshake',
     url: 'https://i.imgflip.com/28j0te.jpg',
     category: 'Office',
@@ -845,7 +845,7 @@ export const memeTemplates: MemeTemplate[] = [
     suggestions: ['Agreement point', 'Team 1', 'Team 2'],
   },
   {
-    id: '1035805',
+    id: '1035805_2',
     name: 'Boardroom Meeting Suggestion',
     url: 'https://i.imgflip.com/m78d.jpg',
     category: 'Office',
@@ -854,7 +854,7 @@ export const memeTemplates: MemeTemplate[] = [
     suggestions: ['We need', 'Suggestion 1', 'Suggestion 2', 'Bad suggestion'],
   },
   {
-    id: '61533',
+    id: '61533_2',
     name: 'X All The Y',
     url: 'https://i.imgflip.com/1bhu.jpg',
     category: 'Office',
@@ -863,7 +863,7 @@ export const memeTemplates: MemeTemplate[] = [
     suggestions: ['Do all the work'],
   },
   {
-    id: '91545132',
+    id: '91545132_2',
     name: 'Monkey Puppet',
     url: 'https://i.imgflip.com/1h4kur.jpg',
     category: 'Office',
@@ -872,7 +872,7 @@ export const memeTemplates: MemeTemplate[] = [
     suggestions: ['When boss walks in'],
   },
   {
-    id: '232936670',
+    id: '232936670_2',
     name: "They're The Same Picture",
     url: 'https://i.imgflip.com/3vqyd3.jpg',
     category: 'Office',
@@ -899,7 +899,7 @@ export const memeTemplates: MemeTemplate[] = [
     suggestions: ['IF I HAD ONE'],
   },
   {
-    id: '89370',
+    id: '89370_2',
     name: 'Roll Safe Think About It',
     url: 'https://i.imgflip.com/1h7in3.jpg',
     category: 'Office',
@@ -917,7 +917,7 @@ export const memeTemplates: MemeTemplate[] = [
     suggestions: ["Y'all got any more of"],
   },
   {
-    id: '21604248',
+    id: '21604248_2',
     name: 'Mugatu So Hot Right Now',
     url: 'https://i.imgflip.com/cv1y0.jpg',
     category: 'Office',
@@ -926,7 +926,7 @@ export const memeTemplates: MemeTemplate[] = [
     suggestions: ['X so hot right now'],
   },
   {
-    id: '6235864',
+    id: '6235864_2',
     name: 'Finding Neverland',
     url: 'https://i.imgflip.com/3pnmg.jpg',
     category: 'Office',
@@ -944,7 +944,7 @@ export const memeTemplates: MemeTemplate[] = [
     suggestions: ['Truth about work', 'NYEH!'],
   },
   {
-    id: '163573',
+    id: '163573_2',
     name: 'Imagination Spongebob',
     url: 'https://i.imgflip.com/3i7p.jpg',
     category: 'Office',
@@ -953,7 +953,7 @@ export const memeTemplates: MemeTemplate[] = [
     suggestions: ['Imaginary benefits', 'Imagination'],
   },
   {
-    id: '101440',
+    id: '101440_2',
     name: 'Leonardo Dicaprio Wolf Of Wall Street',
     url: 'https://i.imgflip.com/265v.jpg',
     category: 'Office',
@@ -973,7 +973,7 @@ export const memeTemplates: MemeTemplate[] = [
     suggestions: ['I receive', 'You receive'],
   },
   {
-    id: '119139145',
+    id: '119139145_2',
     name: 'Blank Nut Button',
     url: 'https://i.imgflip.com/1yxkcp.jpg',
     category: 'Gaming',
@@ -982,7 +982,7 @@ export const memeTemplates: MemeTemplate[] = [
     suggestions: ['Gaming button', 'SMASH'],
   },
   {
-    id: '217743513',
+    id: '217743513_2',
     name: 'UNO Draw 25 Cards',
     url: 'https://i.imgflip.com/3lmzyx.jpg',
     category: 'Gaming',
@@ -1000,7 +1000,7 @@ export const memeTemplates: MemeTemplate[] = [
     suggestions: ['Problem', 'Solution', 'Impact'],
   },
   {
-    id: '226297822',
+    id: '226297822_2',
     name: 'Panik Kalm Panik',
     url: 'https://i.imgflip.com/3qqcim.jpg',
     category: 'Gaming',
@@ -1018,7 +1018,7 @@ export const memeTemplates: MemeTemplate[] = [
     suggestions: ['Say the line', '*YAY*'],
   },
   {
-    id: '93895088',
+    id: '93895088_2',
     name: 'Expanding Brain',
     url: 'https://i.imgflip.com/1jwhww.jpg',
     category: 'Gaming',
@@ -1027,7 +1027,7 @@ export const memeTemplates: MemeTemplate[] = [
     suggestions: ['Small brain', 'Medium brain', 'Large brain', 'Galaxy brain'],
   },
   {
-    id: '110163934',
+    id: '110163934_2',
     name: 'I See This As An Absolute Win',
     url: 'https://i.imgflip.com/1tuird.jpg',
     category: 'Gaming',
@@ -1036,7 +1036,7 @@ export const memeTemplates: MemeTemplate[] = [
     suggestions: ['Gaming outcome', 'Absolute win!'],
   },
   {
-    id: '91538330',
+    id: '91538330_2',
     name: 'X, X Everywhere',
     url: 'https://i.imgflip.com/1ihzfe.jpg',
     category: 'Gaming',
@@ -1045,7 +1045,7 @@ export const memeTemplates: MemeTemplate[] = [
     suggestions: ['Bugs', 'Bugs everywhere'],
   },
   {
-    id: '131940431',
+    id: '131940431_2',
     name: "Gru's Plan",
     url: 'https://i.imgflip.com/26jxvz.jpg',
     category: 'Gaming',
@@ -1056,7 +1056,7 @@ export const memeTemplates: MemeTemplate[] = [
 
   // MOVIES/TV (15 templates)
   {
-    id: '370867422',
+    id: '370867422_2',
     name: 'Megamind No Bitches',
     url: 'https://i.imgflip.com/61phoi.jpg',
     category: 'Movies',
@@ -1065,7 +1065,7 @@ export const memeTemplates: MemeTemplate[] = [
     suggestions: ['No X?'],
   },
   {
-    id: '252600902',
+    id: '252600902_2',
     name: 'Always Has Been',
     url: 'https://i.imgflip.com/46e43q.jpg',
     category: 'Movies',
@@ -1074,7 +1074,7 @@ export const memeTemplates: MemeTemplate[] = [
     suggestions: ["Wait it's all", 'Always has been'],
   },
   {
-    id: '196652226',
+    id: '196652226_2',
     name: 'Spongebob Ight Imma Head Out',
     url: 'https://i.imgflip.com/392xtu.jpg',
     category: 'Movies',
@@ -1083,7 +1083,7 @@ export const memeTemplates: MemeTemplate[] = [
     suggestions: ['Aight', 'Imma head out'],
   },
   {
-    id: '102156234',
+    id: '102156234_2',
     name: 'Mocking Spongebob',
     url: 'https://i.imgflip.com/1otk96.jpg',
     category: 'Movies',
@@ -1092,7 +1092,7 @@ export const memeTemplates: MemeTemplate[] = [
     suggestions: ['MoCkInG tExT'],
   },
   {
-    id: '163573',
+    id: '163573_3',
     name: 'Imagination Spongebob',
     url: 'https://i.imgflip.com/3i7p.jpg',
     category: 'Movies',
@@ -1101,7 +1101,7 @@ export const memeTemplates: MemeTemplate[] = [
     suggestions: ['Imagination'],
   },
   {
-    id: '101511',
+    id: '101511_2',
     name: "Don't You Squidward",
     url: 'https://i.imgflip.com/26br.jpg',
     category: 'Movies',
@@ -1110,7 +1110,7 @@ export const memeTemplates: MemeTemplate[] = [
     suggestions: ['Relatable Squidward moment'],
   },
   {
-    id: '14371066',
+    id: '14371066_2',
     name: 'Star Wars Yoda',
     url: 'https://i.imgflip.com/8k0sa.jpg',
     category: 'Movies',
@@ -1119,7 +1119,7 @@ export const memeTemplates: MemeTemplate[] = [
     suggestions: ['Do or do not'],
   },
   {
-    id: '61546',
+    id: '61546_2',
     name: 'Brace Yourselves X Is Coming',
     url: 'https://i.imgflip.com/1bhm.jpg',
     category: 'Movies',
@@ -1137,7 +1137,7 @@ export const memeTemplates: MemeTemplate[] = [
     suggestions: ['What if I told you'],
   },
   {
-    id: '101440',
+    id: '101440_3',
     name: 'Leonardo Dicaprio Wolf Of Wall Street',
     url: 'https://i.imgflip.com/265v.jpg',
     category: 'Movies',
@@ -1146,7 +1146,7 @@ export const memeTemplates: MemeTemplate[] = [
     suggestions: ["I'm not leaving!"],
   },
   {
-    id: '28034788',
+    id: '28034788_2',
     name: 'Marvel Civil War',
     url: 'https://i.imgflip.com/govs4.jpg',
     category: 'Movies',
@@ -1155,7 +1155,7 @@ export const memeTemplates: MemeTemplate[] = [
     suggestions: ['Team A', 'Team B', 'You'],
   },
   {
-    id: '110163934',
+    id: '110163934_3',
     name: 'I See This As An Absolute Win',
     url: 'https://i.imgflip.com/1tuird.jpg',
     category: 'Movies',
@@ -1164,7 +1164,7 @@ export const memeTemplates: MemeTemplate[] = [
     suggestions: ['Absolute win'],
   },
   {
-    id: '5496396',
+    id: '5496396_2',
     name: 'Leonardo Dicaprio Cheers',
     url: 'https://i.imgflip.com/39t1o.jpg',
     category: 'Movies',
@@ -1173,7 +1173,7 @@ export const memeTemplates: MemeTemplate[] = [
     suggestions: ['Cheers'],
   },
   {
-    id: '61546',
+    id: '61546_3',
     name: 'Winter Is Coming',
     url: 'https://i.imgflip.com/1bhm.jpg',
     category: 'Movies',
@@ -1182,7 +1182,7 @@ export const memeTemplates: MemeTemplate[] = [
     suggestions: ['Winter is coming'],
   },
   {
-    id: '134797956',
+    id: '134797956_2',
     name: 'American Chopper Argument',
     url: 'https://i.imgflip.com/2896ro.jpg',
     category: 'Movies',
@@ -1193,7 +1193,7 @@ export const memeTemplates: MemeTemplate[] = [
 
   // RELATIONSHIPS (10 templates)
   {
-    id: '112126428',
+    id: '112126428_2',
     name: 'Distracted Boyfriend',
     url: 'https://i.imgflip.com/1ur9b0.jpg',
     category: 'Relationships',
@@ -1202,7 +1202,7 @@ export const memeTemplates: MemeTemplate[] = [
     suggestions: ['Current thing', 'Person', 'New thing'],
   },
   {
-    id: '322841258',
+    id: '322841258_2',
     name: "I Bet He's Thinking About Other Women",
     url: 'https://i.imgflip.com/5c7lwq.jpg',
     category: 'Relationships',
@@ -1211,7 +1211,7 @@ export const memeTemplates: MemeTemplate[] = [
     suggestions: ['He must be thinking about other women', 'Random thought'],
   },
   {
-    id: '188390779',
+    id: '188390779_3',
     name: 'Woman Yelling At A Cat',
     url: 'https://i.imgflip.com/345v97.jpg',
     category: 'Relationships',
@@ -1220,7 +1220,7 @@ export const memeTemplates: MemeTemplate[] = [
     suggestions: ['Angry complaint', 'Calm cat'],
   },
   {
-    id: '131087935',
+    id: '131087935_2',
     name: 'Running Away Balloon',
     url: 'https://i.imgflip.com/261o3j.jpg',
     category: 'Relationships',
@@ -1229,7 +1229,7 @@ export const memeTemplates: MemeTemplate[] = [
     suggestions: ['Person', 'Current thing', 'Tempting thing'],
   },
   {
-    id: '135256802',
+    id: '135256802_3',
     name: 'Epic Handshake',
     url: 'https://i.imgflip.com/28j0te.jpg',
     category: 'Relationships',
@@ -1238,7 +1238,7 @@ export const memeTemplates: MemeTemplate[] = [
     suggestions: ['Partner 1', 'Agreement', 'Partner 2'],
   },
   {
-    id: '80707627',
+    id: '80707627_2',
     name: 'Sad Pablo Escobar',
     url: 'https://i.imgflip.com/1c1uej.jpg',
     category: 'Relationships',
@@ -1247,7 +1247,7 @@ export const memeTemplates: MemeTemplate[] = [
     suggestions: ['Alone', 'Thinking'],
   },
   {
-    id: '84341851',
+    id: '84341851_4',
     name: 'Evil Kermit',
     url: 'https://i.imgflip.com/1e7ql7.jpg',
     category: 'Relationships',
@@ -1256,7 +1256,7 @@ export const memeTemplates: MemeTemplate[] = [
     suggestions: ['Good decision', 'Bad decision'],
   },
   {
-    id: '21735',
+    id: '21735_2',
     name: 'The Rock Driving',
     url: 'https://i.imgflip.com/grr.jpg',
     category: 'Relationships',
@@ -1265,7 +1265,7 @@ export const memeTemplates: MemeTemplate[] = [
     suggestions: ['Partner says', 'My thoughts'],
   },
   {
-    id: '134116618',
+    id: '134116618_2',
     name: 'Angry Baby',
     url: 'https://i.imgflip.com/27tuf5.jpg',
     category: 'Relationships',
@@ -1274,7 +1274,7 @@ export const memeTemplates: MemeTemplate[] = [
     suggestions: ['When partner'],
   },
   {
-    id: '87743020',
+    id: '87743020_2',
     name: 'Two Buttons',
     url: 'https://i.imgflip.com/1g8my4.jpg',
     category: 'Relationships',

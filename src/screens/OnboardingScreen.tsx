@@ -126,6 +126,7 @@ const OnboardingScreen: React.FC<OnboardingScreenProps> = ({ navigation }) => {
           title={currentIndex === slides.length - 1 ? "Get Started" : "Next"}
           onPress={handleNext}
           style={styles.button}
+          textStyle={styles.buttonText}
         />
       </View>
     </LinearGradient>
@@ -197,6 +198,15 @@ const styles = StyleSheet.create({
   },
   button: {
     backgroundColor: colors.white,
+    shadowColor: colors.shadow,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 6,
+  },
+  buttonText: {
+    color: colors.primary,
+    fontWeight: '700',
   },
 });
 
