@@ -105,10 +105,12 @@ The app will build and launch on your device/emulator.
 **Problem:** Build fails with error:
 ```
 Execution failed for task ':expo-modules-core:generatePCH'.
-Process 'command '.../ndk/27.x.x/.../clang++' finished with non-zero exit value 1
+Process 'command '.../ndk/.../clang++' finished with non-zero exit value 1
 ```
 
-**Cause:** You have NDK version 27 installed, which is incompatible with Expo SDK 54.
+**Causes:**
+1. NDK version 27 installed (incompatible with Expo SDK 54)
+2. New Architecture enabled (incompatible with expo-modules-core)
 
 **Solution:**
 
@@ -119,8 +121,12 @@ Process 'command '.../ndk/27.x.x/.../clang++' finished with non-zero exit value 
    - Find "NDK (Side by side)" and check version **26.1.10909125**
    - Click Apply and install
 
-2. **Verify the configuration:**
-   - Check `android/gradle.properties` has: `android.ndkVersion=26.1.10909125`
+2. **Verify the configuration files:**
+   - Check `android/gradle.properties` has:
+     ```properties
+     android.ndkVersion=26.1.10909125
+     newArchEnabled=false
+     ```
    - Check `android/build.gradle` has the ext block with ndkVersion
 
 3. **Clean and rebuild:**
@@ -135,6 +141,8 @@ Process 'command '.../ndk/27.x.x/.../clang++' finished with non-zero exit value 
    - Let Gradle sync complete
    - Build > Clean Project
    - Build > Rebuild Project
+
+**Important:** New Architecture MUST be disabled (`newArchEnabled=false`) for the build to succeed.
 
 ### Gradle Build Fails
 
@@ -278,7 +286,8 @@ android/
 ## Key Configuration Files
 
 ### gradle.properties
-- `newArchEnabled=false` - Using stable React Native architecture
+- `newArchEnabled=false` - CRITICAL: New Architecture MUST be disabled (causes compilation errors)
+- `android.ndkVersion=26.1.10909125` - NDK 26 required (NDK 27 incompatible)
 - `hermesEnabled=true` - Using Hermes JavaScript engine for better performance
 - `edgeToEdgeEnabled=true` - Modern edge-to-edge UI
 
