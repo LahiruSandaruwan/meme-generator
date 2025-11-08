@@ -31,7 +31,9 @@ import { saveImageToGallery, generateUniqueId } from '../utils/imageUtils';
 import { TEXT_CONFIG, APP_CONFIG } from '../constants/config';
 import { CustomButton } from '../components/CustomButton';
 import { AdBanner } from '../components/AdBanner';
+import { VoiceInput } from '../components/VoiceInput';
 import { adManager } from '../utils/adManager';
+import { premiumManager } from '../utils/premiumManager';
 
 const { width } = Dimensions.get('window');
 const MEME_WIDTH = width - 32;
@@ -60,8 +62,18 @@ const EditorScreen: React.FC<EditorScreenProps> = ({ navigation, route }) => {
   const [isSaving, setIsSaving] = useState(false);
   const [showTextEditor, setShowTextEditor] = useState(false);
   const [editingText, setEditingText] = useState('');
+  const [isPremium, setIsPremium] = useState(false);
 
   const textColors = ['#FFFFFF', '#000000', '#FF0000', '#FFFF00', '#00FF00', '#0000FF'];
+
+  // Check premium status on mount
+  React.useEffect(() => {
+    const checkPremium = async () => {
+      const status = await premiumManager.getPremiumStatus();
+      setIsPremium(status.isPremium);
+    };
+    checkPremium();
+  }, []);
 
   // Get selected text box
   const selectedText = history.present.find(t => t.id === selectedTextId);
@@ -405,6 +417,55 @@ const EditorScreen: React.FC<EditorScreenProps> = ({ navigation, route }) => {
                 ))}
               </View>
 
+              {/* Text Effects */}
+              <View style={styles.effectSection}>
+                <Text style={styles.controlLabel}>Text Effects</Text>
+                {!isPremium && (
+                  <View style={styles.premiumBadge}>
+                    <Ionicons name="diamond" size={12} color={colors.warning} />
+                  </View>
+                )}
+              </View>
+              <View style={styles.effectPicker}>
+                {[
+                  { value: 'none', label: 'None', icon: 'text-outline' },
+                  { value: 'shadow', label: 'Shadow', icon: 'copy-outline' },
+                  { value: '3d', label: '3D', icon: 'cube-outline' },
+                  { value: 'glow', label: 'Glow', icon: 'sparkles-outline' },
+                ].map((effect) => (
+                  <TouchableOpacity
+                    key={effect.value}
+                    style={[
+                      styles.effectOption,
+                      selectedText.effect === effect.value && styles.effectOptionSelected,
+                    ]}
+                    onPress={() => {
+                      if (effect.value !== 'none' && !isPremium) {
+                        Alert.alert(
+                          'Premium Feature',
+                          'Text effects are a premium feature. Upgrade to unlock them!',
+                          [{ text: 'OK' }]
+                        );
+                        return;
+                      }
+                      updateTextBox(selectedText.id, { effect: effect.value as any });
+                    }}
+                  >
+                    <Ionicons
+                      name={effect.icon as any}
+                      size={24}
+                      color={selectedText.effect === effect.value ? colors.primary : colors.text}
+                    />
+                    <Text style={[
+                      styles.effectOptionLabel,
+                      selectedText.effect === effect.value && styles.effectOptionLabelSelected,
+                    ]}>
+                      {effect.label}
+                    </Text>
+                  </TouchableOpacity>
+                ))}
+              </View>
+
               {/* Delete Button */}
               <TouchableOpacity
                 onPress={() => deleteTextBox(selectedText.id)}
@@ -485,6 +546,13 @@ const EditorScreen: React.FC<EditorScreenProps> = ({ navigation, route }) => {
               autoFocus
               maxLength={100}
             />
+
+            {/* Voice Input */}
+            <VoiceInput
+              onTextReceived={(text) => setEditingText(text)}
+              isPremium={isPremium}
+            />
+
             <View style={styles.modalButtons}>
               <TouchableOpacity
                 onPress={() => setShowTextEditor(false)}
@@ -550,8 +618,50 @@ const DraggableText: React.FC<DraggableTextProps> = ({
     transform: [
       { translateX: translateX.value },
       { translateY: translateY.value },
+      ...(textBox.rotation ? [{ rotate: `${textBox.rotation}deg` }] : []),
     ],
   }));
+
+  // Get text style based on effect
+  const getTextEffectStyle = () => {
+    const effect = textBox.effect || 'none';
+    const baseStyle = {
+      fontSize: textBox.fontSize,
+      color: textBox.color,
+      fontFamily: textBox.fontFamily || undefined,
+    };
+
+    switch (effect) {
+      case 'shadow':
+        return {
+          ...baseStyle,
+          textShadowColor: '#000000',
+          textShadowOffset: { width: 3, height: 3 },
+          textShadowRadius: 6,
+        };
+      case '3d':
+        return {
+          ...baseStyle,
+          textShadowColor: textBox.strokeColor || '#000000',
+          textShadowOffset: { width: 4, height: 4 },
+          textShadowRadius: 2,
+        };
+      case 'glow':
+        return {
+          ...baseStyle,
+          textShadowColor: textBox.color,
+          textShadowOffset: { width: 0, height: 0 },
+          textShadowRadius: 10,
+        };
+      default:
+        return {
+          ...baseStyle,
+          textShadowColor: textBox.strokeColor,
+          textShadowOffset: { width: 2, height: 2 },
+          textShadowRadius: 1,
+        };
+    }
+  };
 
   return (
     <PanGestureHandler onGestureEvent={gestureHandler}>
@@ -565,11 +675,7 @@ const DraggableText: React.FC<DraggableTextProps> = ({
         <Text
           style={[
             styles.memeText,
-            {
-              fontSize: textBox.fontSize,
-              color: textBox.color,
-              textShadowColor: textBox.strokeColor,
-            },
+            getTextEffectStyle(),
           ]}
         >
           {textBox.text.toUpperCase()}
@@ -749,6 +855,39 @@ const styles = StyleSheet.create({
   colorOptionSelected: {
     borderColor: colors.primary,
     borderWidth: 4,
+  },
+  effectSection: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginTop: 16,
+  },
+  effectPicker: {
+    flexDirection: 'row',
+    gap: 12,
+    marginBottom: 16,
+  },
+  effectOption: {
+    flex: 1,
+    backgroundColor: colors.background,
+    borderRadius: 8,
+    padding: 12,
+    alignItems: 'center',
+    borderWidth: 2,
+    borderColor: colors.border,
+    gap: 4,
+  },
+  effectOptionSelected: {
+    borderColor: colors.primary,
+    backgroundColor: `${colors.primary}10`,
+  },
+  effectOptionLabel: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: colors.text,
+  },
+  effectOptionLabelSelected: {
+    color: colors.primary,
   },
   deleteButton: {
     flexDirection: 'row',
