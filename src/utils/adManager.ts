@@ -1,36 +1,47 @@
 import { Platform } from 'react-native';
-import mobileAds, {
-  BannerAd,
-  BannerAdSize,
-  InterstitialAd,
-  RewardedAd,
-  TestIds,
-  AdEventType,
-  RewardedAdEventType,
-} from 'react-native-google-mobile-ads';
 
 /**
- * Real AdMob Integration
+ * Real AdMob Integration (Mobile Only)
  * IMPORTANT: Replace test IDs with your real AdMob unit IDs before production!
+ *
+ * Note: AdMob only works on iOS and Android. On web, this provides stub implementations.
  */
+
+// Conditionally import AdMob only for native platforms
+let mobileAds: any;
+let InterstitialAd: any;
+let RewardedAd: any;
+let TestIds: any;
+let AdEventType: any;
+let RewardedAdEventType: any;
+
+if (Platform.OS !== 'web') {
+  const admob = require('react-native-google-mobile-ads');
+  mobileAds = admob.default;
+  InterstitialAd = admob.InterstitialAd;
+  RewardedAd = admob.RewardedAd;
+  TestIds = admob.TestIds;
+  AdEventType = admob.AdEventType;
+  RewardedAdEventType = admob.RewardedAdEventType;
+}
 
 // Ad Unit IDs - REPLACE THESE WITH YOUR REAL IDS IN PRODUCTION
 const AD_UNIT_IDS = {
   android: {
-    banner: TestIds.BANNER, // Replace with: 'ca-app-pub-XXXXX/XXXXX'
-    interstitial: TestIds.INTERSTITIAL, // Replace with: 'ca-app-pub-XXXXX/XXXXX'
-    rewarded: TestIds.REWARDED, // Replace with: 'ca-app-pub-XXXXX/XXXXX'
+    banner: Platform.OS !== 'web' ? TestIds?.BANNER : 'test-banner', // Replace with: 'ca-app-pub-XXXXX/XXXXX'
+    interstitial: Platform.OS !== 'web' ? TestIds?.INTERSTITIAL : 'test-interstitial', // Replace with: 'ca-app-pub-XXXXX/XXXXX'
+    rewarded: Platform.OS !== 'web' ? TestIds?.REWARDED : 'test-rewarded', // Replace with: 'ca-app-pub-XXXXX/XXXXX'
   },
   ios: {
-    banner: TestIds.BANNER, // Replace with: 'ca-app-pub-XXXXX/XXXXX'
-    interstitial: TestIds.INTERSTITIAL, // Replace with: 'ca-app-pub-XXXXX/XXXXX'
-    rewarded: TestIds.REWARDED, // Replace with: 'ca-app-pub-XXXXX/XXXXX'
+    banner: Platform.OS !== 'web' ? TestIds?.BANNER : 'test-banner', // Replace with: 'ca-app-pub-XXXXX/XXXXX'
+    interstitial: Platform.OS !== 'web' ? TestIds?.INTERSTITIAL : 'test-interstitial', // Replace with: 'ca-app-pub-XXXXX/XXXXX'
+    rewarded: Platform.OS !== 'web' ? TestIds?.REWARDED : 'test-rewarded', // Replace with: 'ca-app-pub-XXXXX/XXXXX'
   },
 };
 
 class AdManager {
-  private interstitialAd: InterstitialAd | null = null;
-  private rewardedAd: RewardedAd | null = null;
+  private interstitialAd: any = null;
+  private rewardedAd: any = null;
   private lastInterstitialTime: number = 0;
   private readonly INTERSTITIAL_FREQUENCY = 60000; // 1 minute minimum between interstitials
   private interstitialLoaded: boolean = false;
@@ -42,11 +53,20 @@ class AdManager {
   }
 
   /**
-   * Initialize AdMob
+   * Initialize AdMob (Native only - stub on web)
    */
   async initialize(): Promise<void> {
     try {
       if (this.initialized) return;
+
+      // Skip initialization on web
+      if (Platform.OS === 'web') {
+        if (__DEV__) {
+          console.log('[AdManager] Running on web - AdMob disabled');
+        }
+        this.initialized = true;
+        return;
+      }
 
       await mobileAds().initialize();
 
@@ -70,9 +90,12 @@ class AdManager {
   }
 
   /**
-   * Load interstitial ad
+   * Load interstitial ad (Native only - stub on web)
    */
   private loadInterstitialAd(): void {
+    // Skip on web
+    if (Platform.OS === 'web') return;
+
     try {
       const adUnitId =
         Platform.OS === 'ios' ? AD_UNIT_IDS.ios.interstitial : AD_UNIT_IDS.android.interstitial;
@@ -106,9 +129,12 @@ class AdManager {
   }
 
   /**
-   * Show interstitial ad with frequency capping
+   * Show interstitial ad with frequency capping (Native only - stub on web)
    */
   async showInterstitialAd(): Promise<boolean> {
+    // Skip on web
+    if (Platform.OS === 'web') return false;
+
     try {
       if (!this.initialized) {
         await this.initialize();
@@ -135,9 +161,12 @@ class AdManager {
   }
 
   /**
-   * Load rewarded ad
+   * Load rewarded ad (Native only - stub on web)
    */
   private loadRewardedAd(): void {
+    // Skip on web
+    if (Platform.OS === 'web') return;
+
     try {
       const adUnitId =
         Platform.OS === 'ios' ? AD_UNIT_IDS.ios.rewarded : AD_UNIT_IDS.android.rewarded;
@@ -171,10 +200,13 @@ class AdManager {
   }
 
   /**
-   * Show rewarded ad
+   * Show rewarded ad (Native only - stub on web)
    * @param onRewarded Callback when user earns reward
    */
   async showRewardedAd(onRewarded: () => void): Promise<boolean> {
+    // Skip on web
+    if (Platform.OS === 'web') return false;
+
     try {
       if (!this.initialized) {
         await this.initialize();
