@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   TouchableOpacity,
   Image,
@@ -6,6 +6,7 @@ import {
   StyleSheet,
   Dimensions,
   View,
+  ActivityIndicator,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -25,6 +26,25 @@ export const MemeTemplate: React.FC<MemeTemplateProps> = ({
   onPress,
 }) => {
   const isTrending = template.category === 'Trending';
+  const [isLoading, setIsLoading] = useState(true);
+  const [hasError, setHasError] = useState(false);
+
+  const handleLoadStart = () => {
+    setIsLoading(true);
+    setHasError(false);
+  };
+
+  const handleLoadEnd = () => {
+    setIsLoading(false);
+  };
+
+  const handleError = () => {
+    setIsLoading(false);
+    setHasError(true);
+    if (__DEV__) {
+      console.warn(`Failed to load template: ${template.name} (${template.url})`);
+    }
+  };
 
   return (
     <TouchableOpacity
@@ -33,14 +53,34 @@ export const MemeTemplate: React.FC<MemeTemplateProps> = ({
       activeOpacity={0.8}
     >
       <View style={styles.imageContainer}>
-        <Image
-          source={{ uri: template.url }}
-          style={styles.image}
-          resizeMode="cover"
-        />
+        {!hasError ? (
+          <>
+            <Image
+              source={{ uri: template.url }}
+              style={styles.image}
+              resizeMode="cover"
+              onLoadStart={handleLoadStart}
+              onLoadEnd={handleLoadEnd}
+              onError={handleError}
+            />
+
+            {/* Loading Indicator */}
+            {isLoading && (
+              <View style={styles.loadingContainer}>
+                <ActivityIndicator size="small" color={colors.primary} />
+              </View>
+            )}
+          </>
+        ) : (
+          /* Error Fallback */
+          <View style={styles.errorContainer}>
+            <Ionicons name="image-outline" size={40} color={colors.textLight} />
+            <Text style={styles.errorText}>Failed to load</Text>
+          </View>
+        )}
 
         {/* Trending Badge */}
-        {isTrending && (
+        {isTrending && !hasError && (
           <LinearGradient
             colors={['#FF6B6B', '#FF8E53']}
             start={{ x: 0, y: 0 }}
@@ -82,6 +122,29 @@ const styles = StyleSheet.create({
     width: '100%',
     height: '100%',
     backgroundColor: colors.border,
+  },
+  loadingContainer: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: colors.background,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  errorContainer: {
+    width: '100%',
+    height: '100%',
+    backgroundColor: colors.background,
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+  },
+  errorText: {
+    fontSize: 12,
+    color: colors.textLight,
+    textAlign: 'center',
   },
   trendingBadge: {
     position: 'absolute',
