@@ -27,7 +27,9 @@ import { CustomButton } from '../components/CustomButton';
 import { AdBanner } from '../components/AdBanner';
 import { VoiceInput } from '../components/VoiceInput';
 import { StickerPicker } from '../components/StickerPicker';
+import { FontPicker } from '../components/FontPicker';
 import { Sticker } from '../utils/stickerData';
+import { Font, getFontFamily } from '../utils/fontData';
 import { adManager } from '../utils/adManager';
 import { premiumManager } from '../utils/premiumManager';
 
@@ -64,6 +66,9 @@ const EditorScreen: React.FC<EditorScreenProps> = ({ navigation, route }) => {
   const [stickers, setStickers] = useState<MemeSticker[]>([]);
   const [selectedStickerId, setSelectedStickerId] = useState<string | null>(null);
   const [showStickerPicker, setShowStickerPicker] = useState(false);
+
+  // Font picker state
+  const [showFontPicker, setShowFontPicker] = useState(false);
 
   const textColors = ['#FFFFFF', '#000000', '#FF0000', '#FFFF00', '#00FF00', '#0000FF'];
 
@@ -205,6 +210,13 @@ const EditorScreen: React.FC<EditorScreenProps> = ({ navigation, route }) => {
   }, []);
 
   const selectedSticker = stickers.find(s => s.id === selectedStickerId);
+
+  // Font management
+  const handleFontSelect = useCallback((font: Font) => {
+    if (selectedTextId) {
+      updateTextBox(selectedTextId, { fontFamily: font.family });
+    }
+  }, [selectedTextId, updateTextBox]);
 
   const handleSaveMeme = async () => {
     try {
@@ -430,6 +442,18 @@ const EditorScreen: React.FC<EditorScreenProps> = ({ navigation, route }) => {
               >
                 <Ionicons name="pencil" size={20} color={colors.primary} />
                 <Text style={styles.editButtonText}>{selectedText.text}</Text>
+              </TouchableOpacity>
+
+              {/* Font Selector */}
+              <TouchableOpacity
+                onPress={() => setShowFontPicker(true)}
+                style={styles.fontButton}
+              >
+                <Ionicons name="text" size={20} color={colors.primary} />
+                <Text style={styles.fontButtonText}>
+                  {selectedText.fontFamily || 'Default Font'}
+                </Text>
+                <Ionicons name="chevron-forward" size={20} color={colors.textLight} />
               </TouchableOpacity>
 
               {/* Font Size Control */}
@@ -719,6 +743,14 @@ const EditorScreen: React.FC<EditorScreenProps> = ({ navigation, route }) => {
         visible={showStickerPicker}
         onClose={() => setShowStickerPicker(false)}
         onStickerSelect={handleStickerSelect}
+      />
+
+      {/* Font Picker Modal */}
+      <FontPicker
+        visible={showFontPicker}
+        onClose={() => setShowFontPicker(false)}
+        onFontSelect={handleFontSelect}
+        currentFontId={selectedText?.fontFamily}
       />
 
       {/* Ad Banner */}
@@ -1026,6 +1058,21 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   editButtonText: {
+    flex: 1,
+    fontSize: 16,
+    color: colors.text,
+    fontWeight: '600',
+  },
+  fontButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: colors.background,
+    borderRadius: 8,
+    padding: 12,
+    marginBottom: 16,
+    gap: 8,
+  },
+  fontButtonText: {
     flex: 1,
     fontSize: 16,
     color: colors.text,
