@@ -17,13 +17,24 @@ export const VoiceInput: React.FC<VoiceInputProps> = ({ onTextReceived, isPremiu
   const [recognizedText, setRecognizedText] = useState('');
 
   useEffect(() => {
-    // Set up voice recognition event listeners
-    Voice.onSpeechResults = onSpeechResults;
-    Voice.onSpeechError = onSpeechError;
+    try {
+      // Set up voice recognition event listeners
+      Voice.onSpeechResults = onSpeechResults;
+      Voice.onSpeechError = onSpeechError;
+    } catch (error) {
+      // Silently handle worklets initialization error
+      if (__DEV__) {
+        console.warn('Voice recognition setup failed:', error);
+      }
+    }
 
     return () => {
       // Clean up
-      Voice.destroy().then(Voice.removeAllListeners);
+      try {
+        Voice.destroy().then(Voice.removeAllListeners);
+      } catch (error) {
+        // Silently handle cleanup errors
+      }
     };
   }, []);
 

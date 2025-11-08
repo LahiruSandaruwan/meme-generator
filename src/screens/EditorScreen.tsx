@@ -17,13 +17,7 @@ import { Ionicons } from '@expo/vector-icons';
 import * as Sharing from 'expo-sharing';
 import ViewShot from 'react-native-view-shot';
 import { GestureHandlerRootView, PanGestureHandler, PanGestureHandlerGestureEvent } from 'react-native-gesture-handler';
-import Animated, {
-  useAnimatedGestureHandler,
-  useAnimatedStyle,
-  useSharedValue,
-  runOnJS,
-  withSpring,
-} from 'react-native-reanimated';
+import { Animated } from 'react-native';
 import { colors } from '../constants/colors';
 import { RootStackParamList, MemeText, EditorHistory } from '../types';
 import { saveMeme } from '../utils/storage';
@@ -591,36 +585,26 @@ const DraggableText: React.FC<DraggableTextProps> = ({
   onSelect,
   onPositionUpdate
 }) => {
-  const translateX = useSharedValue(textBox.x);
-  const translateY = useSharedValue(textBox.y);
+  const startPos = useRef({ x: 0, y: 0 });
 
-  React.useEffect(() => {
-    translateX.value = textBox.x;
-    translateY.value = textBox.y;
-  }, [textBox.x, textBox.y]);
+  const onGestureEvent = (event: PanGestureHandlerGestureEvent) => {
+    const { state, translationX, translationY } = event.nativeEvent;
 
-  const gestureHandler = useAnimatedGestureHandler<PanGestureHandlerGestureEvent>({
-    onStart: (_, ctx: any) => {
-      ctx.startX = translateX.value;
-      ctx.startY = translateY.value;
-      runOnJS(onSelect)();
-    },
-    onActive: (event, ctx: any) => {
-      translateX.value = ctx.startX + event.translationX;
-      translateY.value = ctx.startY + event.translationY;
-    },
-    onEnd: () => {
-      runOnJS(onPositionUpdate)(translateX.value, translateY.value);
-    },
-  });
+    if (state === 2) { // BEGAN
+      startPos.current = { x: textBox.x, y: textBox.y };
+      onSelect();
+    } else if (state === 4) { // ACTIVE
+      const newX = startPos.current.x + translationX;
+      const newY = startPos.current.y + translationY;
+      onPositionUpdate(newX, newY);
+    }
+  };
 
-  const animatedStyle = useAnimatedStyle(() => ({
-    transform: [
-      { translateX: translateX.value },
-      { translateY: translateY.value },
-      ...(textBox.rotation ? [{ rotate: `${textBox.rotation}deg` }] : []),
-    ],
-  }));
+  const transform = [
+    { translateX: textBox.x },
+    { translateY: textBox.y },
+    ...(textBox.rotation ? [{ rotate: `${textBox.rotation}deg` }] : []),
+  ];
 
   // Get text style based on effect
   const getTextEffectStyle = () => {
@@ -664,11 +648,11 @@ const DraggableText: React.FC<DraggableTextProps> = ({
   };
 
   return (
-    <PanGestureHandler onGestureEvent={gestureHandler}>
-      <Animated.View
+    <PanGestureHandler onGestureEvent={onGestureEvent}>
+      <View
         style={[
           styles.draggableContainer,
-          animatedStyle,
+          { transform },
           isSelected && styles.selectedTextBox,
         ]}
       >
@@ -680,7 +664,7 @@ const DraggableText: React.FC<DraggableTextProps> = ({
         >
           {textBox.text.toUpperCase()}
         </Text>
-      </Animated.View>
+      </View>
     </PanGestureHandler>
   );
 };
