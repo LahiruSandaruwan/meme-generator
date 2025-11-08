@@ -16,6 +16,7 @@ This guide will help you open and run the Meme Generator app in Android Studio.
    - Android SDK Platform-Tools
    - Android SDK Tools
    - Android Emulator (for testing without a physical device)
+   - **NDK (Side by side) 26.1.10909125** (IMPORTANT - see installation below)
 
 ## Step-by-Step Instructions
 
@@ -27,7 +28,22 @@ First, ensure all npm packages are installed:
 npm install
 ```
 
-### 2. Generate Native Android Project
+### 2. Install Required NDK Version (CRITICAL)
+
+Before opening the project, install NDK 26.1.10909125:
+
+1. Open Android Studio
+2. Go to **Tools > SDK Manager**
+3. Click on the **SDK Tools** tab
+4. Check **Show Package Details** (bottom right)
+5. Scroll down to **NDK (Side by side)**
+6. Check the box for version **26.1.10909125**
+7. Uncheck any NDK version 27.x.x if installed (or keep it, but 26 will be used)
+8. Click **Apply** and wait for installation to complete
+
+**Why NDK 26?** Expo SDK 54 has compatibility issues with NDK 27. The build will fail with clang++ errors if you use NDK 27.
+
+### 3. Generate Native Android Project
 
 If the `android/` folder doesn't exist or needs to be regenerated:
 
@@ -40,8 +56,9 @@ This command creates the native Android project with all necessary configuration
 - Expo modules
 - React Native dependencies
 - Gradle build scripts
+- NDK version specification
 
-### 3. Open Project in Android Studio
+### 4. Open Project in Android Studio
 
 **IMPORTANT:** Open the `android` folder, NOT the root project folder.
 
@@ -51,7 +68,7 @@ This command creates the native Android project with all necessary configuration
 4. Select the `android` folder (the one containing `build.gradle` and `settings.gradle`)
 5. Click "OK"
 
-### 4. Wait for Gradle Sync
+### 5. Wait for Gradle Sync
 
 Android Studio will automatically:
 - Sync Gradle files
@@ -60,7 +77,9 @@ Android Studio will automatically:
 
 This may take 5-10 minutes on first run. Watch the progress bar at the bottom of the screen.
 
-### 5. Configure Android Emulator (Optional)
+**If you get errors during sync**, see the Troubleshooting section below.
+
+### 6. Configure Android Emulator (Optional)
 
 If you don't have a physical device:
 
@@ -70,7 +89,7 @@ If you don't have a physical device:
 4. Select a system image (e.g., Android 14 - API 34)
 5. Click "Finish"
 
-### 6. Run the App
+### 7. Run the App
 
 1. Ensure your emulator is running or physical device is connected
 2. In Android Studio toolbar, select your device from the dropdown
@@ -80,6 +99,42 @@ If you don't have a physical device:
 The app will build and launch on your device/emulator.
 
 ## Troubleshooting
+
+### NDK Compilation Error (expo-modules-core:generatePCH)
+
+**Problem:** Build fails with error:
+```
+Execution failed for task ':expo-modules-core:generatePCH'.
+Process 'command '.../ndk/27.x.x/.../clang++' finished with non-zero exit value 1
+```
+
+**Cause:** You have NDK version 27 installed, which is incompatible with Expo SDK 54.
+
+**Solution:**
+
+1. **Install NDK 26.1.10909125:**
+   - Open Android Studio
+   - Tools > SDK Manager > SDK Tools tab
+   - Check "Show Package Details"
+   - Find "NDK (Side by side)" and check version **26.1.10909125**
+   - Click Apply and install
+
+2. **Verify the configuration:**
+   - Check `android/gradle.properties` has: `android.ndkVersion=26.1.10909125`
+   - Check `android/build.gradle` has the ext block with ndkVersion
+
+3. **Clean and rebuild:**
+   ```bash
+   cd android
+   ./gradlew clean
+   cd ..
+   ```
+
+4. **In Android Studio:**
+   - File > Invalidate Caches > Invalidate and Restart
+   - Let Gradle sync complete
+   - Build > Clean Project
+   - Build > Rebuild Project
 
 ### Gradle Build Fails
 
