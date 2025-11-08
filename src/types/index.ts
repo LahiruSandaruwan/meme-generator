@@ -24,6 +24,15 @@ export interface MemeText {
   gradientColors?: string[];
 }
 
+export interface MemeSticker {
+  id: string;
+  emoji: string;
+  x: number;
+  y: number;
+  size: number;
+  rotation: number;
+}
+
 export interface SavedMeme {
   id: string;
   uri: string;

@@ -19,13 +19,15 @@ import ViewShot from 'react-native-view-shot';
 import { GestureHandlerRootView, PanGestureHandler, PanGestureHandlerGestureEvent } from 'react-native-gesture-handler';
 import { Animated } from 'react-native';
 import { colors } from '../constants/colors';
-import { RootStackParamList, MemeText, EditorHistory } from '../types';
+import { RootStackParamList, MemeText, MemeSticker, EditorHistory } from '../types';
 import { saveMeme } from '../utils/storage';
 import { saveImageToGallery, generateUniqueId } from '../utils/imageUtils';
 import { TEXT_CONFIG, APP_CONFIG } from '../constants/config';
 import { CustomButton } from '../components/CustomButton';
 import { AdBanner } from '../components/AdBanner';
 import { VoiceInput } from '../components/VoiceInput';
+import { StickerPicker } from '../components/StickerPicker';
+import { Sticker } from '../utils/stickerData';
 import { adManager } from '../utils/adManager';
 import { premiumManager } from '../utils/premiumManager';
 
@@ -57,6 +59,11 @@ const EditorScreen: React.FC<EditorScreenProps> = ({ navigation, route }) => {
   const [showTextEditor, setShowTextEditor] = useState(false);
   const [editingText, setEditingText] = useState('');
   const [isPremium, setIsPremium] = useState(false);
+
+  // Stickers state
+  const [stickers, setStickers] = useState<MemeSticker[]>([]);
+  const [selectedStickerId, setSelectedStickerId] = useState<string | null>(null);
+  const [showStickerPicker, setShowStickerPicker] = useState(false);
 
   const textColors = ['#FFFFFF', '#000000', '#FF0000', '#FFFF00', '#00FF00', '#0000FF'];
 
@@ -162,6 +169,43 @@ const EditorScreen: React.FC<EditorScreenProps> = ({ navigation, route }) => {
     setShowTextEditor(false);
   }, [selectedTextId, editingText, updateTextBox]);
 
+  // Sticker management
+  const handleStickerSelect = useCallback((sticker: Sticker) => {
+    const newSticker: MemeSticker = {
+      id: generateUniqueId(),
+      emoji: sticker.emoji,
+      x: MEME_WIDTH / 2 - 50,
+      y: MEME_WIDTH / 2 - 50,
+      size: 80,
+      rotation: 0,
+    };
+    setStickers(prev => [...prev, newSticker]);
+    setSelectedStickerId(newSticker.id);
+    // Deselect text when adding sticker
+    setSelectedTextId(null);
+  }, []);
+
+  const deleteSticker = useCallback((id: string) => {
+    setStickers(prev => prev.filter(s => s.id !== id));
+    if (selectedStickerId === id) {
+      setSelectedStickerId(null);
+    }
+  }, [selectedStickerId]);
+
+  const updateSticker = useCallback((id: string, updates: Partial<MemeSticker>) => {
+    setStickers(prev => prev.map(s =>
+      s.id === id ? { ...s, ...updates } : s
+    ));
+  }, []);
+
+  const updateStickerPosition = useCallback((id: string, x: number, y: number) => {
+    setStickers(prev => prev.map(s =>
+      s.id === id ? { ...s, x, y } : s
+    ));
+  }, []);
+
+  const selectedSticker = stickers.find(s => s.id === selectedStickerId);
+
   const handleSaveMeme = async () => {
     try {
       setIsSaving(true);
@@ -170,8 +214,9 @@ const EditorScreen: React.FC<EditorScreenProps> = ({ navigation, route }) => {
         throw new Error('ViewShot ref not available');
       }
 
-      // Deselect text box before capture
+      // Deselect text box and sticker before capture
       setSelectedTextId(null);
+      setSelectedStickerId(null);
       await new Promise(resolve => setTimeout(resolve, 100));
 
       // Capture the meme
@@ -219,8 +264,9 @@ const EditorScreen: React.FC<EditorScreenProps> = ({ navigation, route }) => {
         throw new Error('ViewShot ref not available');
       }
 
-      // Deselect text box before capture
+      // Deselect text box and sticker before capture
       setSelectedTextId(null);
+      setSelectedStickerId(null);
       await new Promise(resolve => setTimeout(resolve, 100));
 
       const uri = await viewShotRef.current.capture();
@@ -307,8 +353,25 @@ const EditorScreen: React.FC<EditorScreenProps> = ({ navigation, route }) => {
                   key={textBox.id}
                   textBox={textBox}
                   isSelected={selectedTextId === textBox.id}
-                  onSelect={() => setSelectedTextId(textBox.id)}
+                  onSelect={() => {
+                    setSelectedTextId(textBox.id);
+                    setSelectedStickerId(null);
+                  }}
                   onPositionUpdate={(x, y) => updateTextPosition(textBox.id, x, y)}
+                />
+              ))}
+
+              {/* Draggable Stickers */}
+              {stickers.map(sticker => (
+                <DraggableSticker
+                  key={sticker.id}
+                  sticker={sticker}
+                  isSelected={selectedStickerId === sticker.id}
+                  onSelect={() => {
+                    setSelectedStickerId(sticker.id);
+                    setSelectedTextId(null);
+                  }}
+                  onPositionUpdate={(x, y) => updateStickerPosition(sticker.id, x, y)}
                 />
               ))}
 
@@ -341,10 +404,19 @@ const EditorScreen: React.FC<EditorScreenProps> = ({ navigation, route }) => {
               </TouchableOpacity>
             </View>
 
-            <TouchableOpacity onPress={addTextBox} style={styles.addTextButton}>
-              <Ionicons name="add-circle" size={24} color={colors.white} />
-              <Text style={styles.addTextButtonText}>Add Text</Text>
-            </TouchableOpacity>
+            <View style={styles.addButtonsContainer}>
+              <TouchableOpacity onPress={addTextBox} style={styles.addTextButton}>
+                <Ionicons name="add-circle" size={20} color={colors.white} />
+                <Text style={styles.addTextButtonText}>Text</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                onPress={() => setShowStickerPicker(true)}
+                style={styles.addStickerButton}
+              >
+                <Ionicons name="happy-outline" size={20} color={colors.white} />
+                <Text style={styles.addStickerButtonText}>Sticker</Text>
+              </TouchableOpacity>
+            </View>
           </View>
 
           {/* Selected Text Controls */}
@@ -471,8 +543,85 @@ const EditorScreen: React.FC<EditorScreenProps> = ({ navigation, route }) => {
             </View>
           )}
 
+          {/* Selected Sticker Controls */}
+          {selectedSticker && (
+            <View style={styles.selectedTextControls}>
+              <Text style={styles.sectionTitle}>Edit Sticker</Text>
+
+              {/* Size Control */}
+              <Text style={styles.controlLabel}>Size: {selectedSticker.size}</Text>
+              <View style={styles.sliderContainer}>
+                <TouchableOpacity
+                  onPress={() => updateSticker(selectedSticker.id, {
+                    size: Math.max(40, selectedSticker.size - 10)
+                  })}
+                  style={styles.sliderButton}
+                >
+                  <Ionicons name="remove-circle" size={32} color={colors.primary} />
+                </TouchableOpacity>
+                <View style={styles.sliderBar}>
+                  <View
+                    style={[
+                      styles.sliderFill,
+                      {
+                        width: `${((selectedSticker.size - 40) / (200 - 40)) * 100}%`,
+                      },
+                    ]}
+                  />
+                </View>
+                <TouchableOpacity
+                  onPress={() => updateSticker(selectedSticker.id, {
+                    size: Math.min(200, selectedSticker.size + 10)
+                  })}
+                  style={styles.sliderButton}
+                >
+                  <Ionicons name="add-circle" size={32} color={colors.primary} />
+                </TouchableOpacity>
+              </View>
+
+              {/* Rotation Control */}
+              <Text style={styles.controlLabel}>Rotation: {selectedSticker.rotation}°</Text>
+              <View style={styles.rotationButtons}>
+                <TouchableOpacity
+                  onPress={() => updateSticker(selectedSticker.id, {
+                    rotation: (selectedSticker.rotation - 15 + 360) % 360
+                  })}
+                  style={styles.rotationButton}
+                >
+                  <Ionicons name="arrow-undo" size={24} color={colors.primary} />
+                  <Text style={styles.rotationButtonText}>-15°</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  onPress={() => updateSticker(selectedSticker.id, { rotation: 0 })}
+                  style={styles.rotationButton}
+                >
+                  <Ionicons name="refresh" size={24} color={colors.primary} />
+                  <Text style={styles.rotationButtonText}>Reset</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  onPress={() => updateSticker(selectedSticker.id, {
+                    rotation: (selectedSticker.rotation + 15) % 360
+                  })}
+                  style={styles.rotationButton}
+                >
+                  <Ionicons name="arrow-redo" size={24} color={colors.primary} />
+                  <Text style={styles.rotationButtonText}>+15°</Text>
+                </TouchableOpacity>
+              </View>
+
+              {/* Delete Button */}
+              <TouchableOpacity
+                onPress={() => deleteSticker(selectedSticker.id)}
+                style={styles.deleteButton}
+              >
+                <Ionicons name="trash" size={20} color={colors.white} />
+                <Text style={styles.deleteButtonText}>Delete Sticker</Text>
+              </TouchableOpacity>
+            </View>
+          )}
+
           {/* Hint when no text selected */}
-          {!selectedText && history.present.length === 0 && (
+          {!selectedText && !selectedSticker && history.present.length === 0 && stickers.length === 0 && (
             <View style={styles.hintContainer}>
               <Ionicons name="information-circle" size={48} color={colors.textLight} />
               <Text style={styles.hintText}>Tap "Add Text" to get started!</Text>
@@ -480,11 +629,11 @@ const EditorScreen: React.FC<EditorScreenProps> = ({ navigation, route }) => {
             </View>
           )}
 
-          {!selectedText && history.present.length > 0 && (
+          {!selectedText && !selectedSticker && (history.present.length > 0 || stickers.length > 0) && (
             <View style={styles.hintContainer}>
               <Ionicons name="hand-left" size={48} color={colors.textLight} />
-              <Text style={styles.hintText}>Tap a text box to edit it</Text>
-              <Text style={styles.hintSubtext}>Drag text boxes to reposition them</Text>
+              <Text style={styles.hintText}>Tap text or sticker to edit</Text>
+              <Text style={styles.hintSubtext}>Drag to reposition, use controls to customize</Text>
             </View>
           )}
 
@@ -564,6 +713,13 @@ const EditorScreen: React.FC<EditorScreenProps> = ({ navigation, route }) => {
           </View>
         </View>
       </Modal>
+
+      {/* Sticker Picker Modal */}
+      <StickerPicker
+        visible={showStickerPicker}
+        onClose={() => setShowStickerPicker(false)}
+        onStickerSelect={handleStickerSelect}
+      />
 
       {/* Ad Banner */}
       <AdBanner />
@@ -669,6 +825,58 @@ const DraggableText: React.FC<DraggableTextProps> = ({
   );
 };
 
+// Draggable Sticker Component
+interface DraggableStickerProps {
+  sticker: MemeSticker;
+  isSelected: boolean;
+  onSelect: () => void;
+  onPositionUpdate: (x: number, y: number) => void;
+}
+
+const DraggableSticker: React.FC<DraggableStickerProps> = ({
+  sticker,
+  isSelected,
+  onSelect,
+  onPositionUpdate
+}) => {
+  const startPos = useRef({ x: 0, y: 0 });
+
+  const onGestureEvent = (event: PanGestureHandlerGestureEvent) => {
+    const { state, translationX, translationY } = event.nativeEvent;
+
+    if (state === 2) { // BEGAN
+      startPos.current = { x: sticker.x, y: sticker.y };
+      onSelect();
+    } else if (state === 4) { // ACTIVE
+      const newX = startPos.current.x + translationX;
+      const newY = startPos.current.y + translationY;
+      onPositionUpdate(newX, newY);
+    }
+  };
+
+  const transform = [
+    { translateX: sticker.x },
+    { translateY: sticker.y },
+    { rotate: `${sticker.rotation}deg` },
+  ];
+
+  return (
+    <PanGestureHandler onGestureEvent={onGestureEvent}>
+      <View
+        style={[
+          styles.draggableContainer,
+          { transform },
+          isSelected && styles.selectedStickerBox,
+        ]}
+      >
+        <Text style={{ fontSize: sticker.size }}>
+          {sticker.emoji}
+        </Text>
+      </View>
+    </PanGestureHandler>
+  );
+};
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -708,6 +916,13 @@ const styles = StyleSheet.create({
     borderStyle: 'dashed',
     borderRadius: 4,
     backgroundColor: 'rgba(74, 144, 226, 0.1)',
+  },
+  selectedStickerBox: {
+    borderWidth: 2,
+    borderColor: '#FF6B6B',
+    borderStyle: 'dashed',
+    borderRadius: 4,
+    backgroundColor: 'rgba(255, 107, 107, 0.1)',
   },
   memeText: {
     fontWeight: '900',
@@ -750,18 +965,38 @@ const styles = StyleSheet.create({
   iconButtonDisabled: {
     opacity: 0.5,
   },
+  addButtonsContainer: {
+    flexDirection: 'row',
+    gap: 8,
+  },
   addTextButton: {
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: colors.primary,
-    paddingHorizontal: 16,
-    paddingVertical: 12,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
     borderRadius: 8,
-    gap: 8,
+    gap: 6,
+    flex: 1,
   },
   addTextButtonText: {
     color: colors.white,
-    fontSize: 16,
+    fontSize: 14,
+    fontWeight: '600',
+  },
+  addStickerButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#FF6B6B',
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+    borderRadius: 8,
+    gap: 6,
+    flex: 1,
+  },
+  addStickerButtonText: {
+    color: colors.white,
+    fontSize: 14,
     fontWeight: '600',
   },
   selectedTextControls: {
@@ -872,6 +1107,26 @@ const styles = StyleSheet.create({
   },
   effectOptionLabelSelected: {
     color: colors.primary,
+  },
+  rotationButtons: {
+    flexDirection: 'row',
+    gap: 12,
+    marginBottom: 16,
+  },
+  rotationButton: {
+    flex: 1,
+    backgroundColor: colors.background,
+    borderRadius: 8,
+    padding: 12,
+    alignItems: 'center',
+    borderWidth: 2,
+    borderColor: colors.border,
+    gap: 4,
+  },
+  rotationButtonText: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: colors.text,
   },
   deleteButton: {
     flexDirection: 'row',
