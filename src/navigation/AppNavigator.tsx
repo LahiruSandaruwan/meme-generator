@@ -12,6 +12,8 @@ import HomeScreen from '../screens/HomeScreen';
 import EditorScreen from '../screens/EditorScreen';
 import GalleryScreen from '../screens/GalleryScreen';
 import SettingsScreen from '../screens/SettingsScreen';
+import PrivacyPolicyScreen from '../screens/PrivacyPolicyScreen';
+import PremiumScreen from '../screens/PremiumScreen';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 const Tab = createBottomTabNavigator<MainTabParamList>();
@@ -112,6 +114,22 @@ export default function AppNavigator() {
           component={EditorScreen}
           options={{
             title: 'Create Meme',
+            presentation: 'modal',
+          }}
+        />
+        <Stack.Screen
+          name="PrivacyPolicy"
+          component={PrivacyPolicyScreen}
+          options={{
+            title: 'Privacy Policy',
+            presentation: 'modal',
+          }}
+        />
+        <Stack.Screen
+          name="Premium"
+          component={PremiumScreen}
+          options={{
+            headerShown: false,
             presentation: 'modal',
           }}
         />

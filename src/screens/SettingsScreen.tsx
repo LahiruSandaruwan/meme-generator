@@ -9,10 +9,13 @@ import {
   Linking,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { useNavigation } from '@react-navigation/native';
 import * as Sharing from 'expo-sharing';
 import { colors } from '../constants/colors';
 import { APP_CONFIG } from '../constants/config';
 import { clearAllData } from '../utils/storage';
+import { RootStackParamList } from '../types';
 
 interface SettingItemProps {
   icon: string;
@@ -47,7 +50,11 @@ const SettingItem: React.FC<SettingItemProps> = ({
   </TouchableOpacity>
 );
 
+type SettingsScreenNavigationProp = NativeStackNavigationProp<RootStackParamList>;
+
 const SettingsScreen: React.FC = () => {
+  const navigation = useNavigation<SettingsScreenNavigationProp>();
+
   const handleRateApp = () => {
     Alert.alert(
       'Rate Our App',
@@ -84,19 +91,7 @@ const SettingsScreen: React.FC = () => {
   };
 
   const handlePrivacyPolicy = () => {
-    Alert.alert(
-      'Privacy Policy',
-      'Your privacy is important to us. We only store memes locally on your device. Ad data is handled by Google AdMob according to their privacy policy.',
-      [
-        { text: 'OK' },
-        {
-          text: 'Learn More',
-          onPress: () => {
-            Linking.openURL('https://policies.google.com/privacy');
-          },
-        },
-      ]
-    );
+    navigation.navigate('PrivacyPolicy');
   };
 
   const handleClearCache = () => {
@@ -146,9 +141,26 @@ const SettingsScreen: React.FC = () => {
     );
   };
 
+  const handleGoPremium = () => {
+    navigation.navigate('Premium');
+  };
+
   return (
     <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
       <View style={styles.content}>
+        {/* Premium Section */}
+        <View style={styles.section}>
+          <View style={styles.card}>
+            <SettingItem
+              icon="diamond"
+              title="Go Premium"
+              subtitle="Remove ads, watermarks & unlock all features"
+              onPress={handleGoPremium}
+              iconColor="#FFD700"
+            />
+          </View>
+        </View>
+
         {/* App Section */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>App</Text>

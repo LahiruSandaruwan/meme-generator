@@ -17,6 +17,11 @@ export interface MemeText {
   color: string;
   strokeColor: string;
   strokeWidth: number;
+  fontFamily?: string;
+  rotation?: number;
+  effect?: 'none' | 'shadow' | '3d' | 'gradient' | 'glow';
+  shadowOpacity?: number;
+  gradientColors?: string[];
 }
 
 export interface SavedMeme {
@@ -33,6 +38,12 @@ export interface OnboardingSlide {
   icon: string;
 }
 
+export interface EditorHistory {
+  past: MemeText[][];
+  present: MemeText[];
+  future: MemeText[][];
+}
+
 export type RootStackParamList = {
   Onboarding: undefined;
   MainTabs: undefined;
@@ -41,6 +52,8 @@ export type RootStackParamList = {
     templateId?: string;
     templateName?: string;
   };
+  PrivacyPolicy: undefined;
+  Premium: undefined;
 };
 
 export type MainTabParamList = {

@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useCallback } from 'react';
 import {
   View,
   Text,
@@ -9,14 +9,23 @@ import {
   TouchableOpacity,
   Alert,
   Dimensions,
+  Modal,
 } from 'react-native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RouteProp } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
 import * as Sharing from 'expo-sharing';
 import ViewShot from 'react-native-view-shot';
+import { GestureHandlerRootView, PanGestureHandler, PanGestureHandlerGestureEvent } from 'react-native-gesture-handler';
+import Animated, {
+  useAnimatedGestureHandler,
+  useAnimatedStyle,
+  useSharedValue,
+  runOnJS,
+  withSpring,
+} from 'react-native-reanimated';
 import { colors } from '../constants/colors';
-import { RootStackParamList } from '../types';
+import { RootStackParamList, MemeText, EditorHistory } from '../types';
 import { saveMeme } from '../utils/storage';
 import { saveImageToGallery, generateUniqueId } from '../utils/imageUtils';
 import { TEXT_CONFIG, APP_CONFIG } from '../constants/config';
@@ -39,14 +48,113 @@ const EditorScreen: React.FC<EditorScreenProps> = ({ navigation, route }) => {
   const { templateUri } = route.params;
   const viewShotRef = useRef<ViewShot>(null);
 
-  const [topText, setTopText] = useState('');
-  const [bottomText, setBottomText] = useState('');
-  const [fontSize, setFontSize] = useState(TEXT_CONFIG.defaultFontSize);
-  const [textColor, setTextColor] = useState(TEXT_CONFIG.defaultColor);
+  // Text boxes state with undo/redo support
+  const [history, setHistory] = useState<EditorHistory>({
+    past: [],
+    present: [],
+    future: [],
+  });
+
+  const [selectedTextId, setSelectedTextId] = useState<string | null>(null);
   const [showWatermark, setShowWatermark] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
+  const [showTextEditor, setShowTextEditor] = useState(false);
+  const [editingText, setEditingText] = useState('');
 
   const textColors = ['#FFFFFF', '#000000', '#FF0000', '#FFFF00', '#00FF00', '#0000FF'];
+
+  // Get selected text box
+  const selectedText = history.present.find(t => t.id === selectedTextId);
+
+  // History management
+  const updateHistory = useCallback((newPresent: MemeText[]) => {
+    setHistory(prev => ({
+      past: [...prev.past, prev.present],
+      present: newPresent,
+      future: [],
+    }));
+  }, []);
+
+  const undo = useCallback(() => {
+    if (history.past.length === 0) return;
+
+    const previous = history.past[history.past.length - 1];
+    const newPast = history.past.slice(0, -1);
+
+    setHistory({
+      past: newPast,
+      present: previous,
+      future: [history.present, ...history.future],
+    });
+  }, [history]);
+
+  const redo = useCallback(() => {
+    if (history.future.length === 0) return;
+
+    const next = history.future[0];
+    const newFuture = history.future.slice(1);
+
+    setHistory({
+      past: [...history.past, history.present],
+      present: next,
+      future: newFuture,
+    });
+  }, [history]);
+
+  // Text box management
+  const addTextBox = useCallback(() => {
+    const newText: MemeText = {
+      id: generateUniqueId(),
+      text: 'NEW TEXT',
+      x: MEME_WIDTH / 2 - 50,
+      y: MEME_WIDTH / 2 - 20,
+      fontSize: TEXT_CONFIG.defaultFontSize,
+      color: TEXT_CONFIG.defaultColor,
+      strokeColor: TEXT_CONFIG.defaultStrokeColor,
+      strokeWidth: 2,
+    };
+
+    const newPresent = [...history.present, newText];
+    updateHistory(newPresent);
+    setSelectedTextId(newText.id);
+  }, [history.present, updateHistory]);
+
+  const deleteTextBox = useCallback((id: string) => {
+    const newPresent = history.present.filter(t => t.id !== id);
+    updateHistory(newPresent);
+    if (selectedTextId === id) {
+      setSelectedTextId(null);
+    }
+  }, [history.present, selectedTextId, updateHistory]);
+
+  const updateTextBox = useCallback((id: string, updates: Partial<MemeText>) => {
+    const newPresent = history.present.map(t =>
+      t.id === id ? { ...t, ...updates } : t
+    );
+    updateHistory(newPresent);
+  }, [history.present, updateHistory]);
+
+  const updateTextPosition = useCallback((id: string, x: number, y: number) => {
+    setHistory(prev => ({
+      ...prev,
+      present: prev.present.map(t =>
+        t.id === id ? { ...t, x, y } : t
+      ),
+    }));
+  }, []);
+
+  const handleEditText = useCallback(() => {
+    if (!selectedText) return;
+    setEditingText(selectedText.text);
+    setShowTextEditor(true);
+  }, [selectedText]);
+
+  const handleSaveText = useCallback(() => {
+    if (selectedTextId) {
+      updateTextBox(selectedTextId, { text: editingText });
+    }
+    setShowTextEditor(false);
+  }, [selectedTextId, editingText, updateTextBox]);
 
   const handleSaveMeme = async () => {
     try {
@@ -55,6 +163,10 @@ const EditorScreen: React.FC<EditorScreenProps> = ({ navigation, route }) => {
       if (!viewShotRef.current || !viewShotRef.current.capture) {
         throw new Error('ViewShot ref not available');
       }
+
+      // Deselect text box before capture
+      setSelectedTextId(null);
+      await new Promise(resolve => setTimeout(resolve, 100));
 
       // Capture the meme
       const uri = await viewShotRef.current.capture();
@@ -100,6 +212,10 @@ const EditorScreen: React.FC<EditorScreenProps> = ({ navigation, route }) => {
       if (!viewShotRef.current || !viewShotRef.current.capture) {
         throw new Error('ViewShot ref not available');
       }
+
+      // Deselect text box before capture
+      setSelectedTextId(null);
+      await new Promise(resolve => setTimeout(resolve, 100));
 
       const uri = await viewShotRef.current.capture();
 
@@ -159,7 +275,7 @@ const EditorScreen: React.FC<EditorScreenProps> = ({ navigation, route }) => {
   };
 
   return (
-    <View style={styles.container}>
+    <GestureHandlerRootView style={styles.container}>
       <ScrollView
         style={styles.scrollView}
         contentContainerStyle={styles.scrollContent}
@@ -179,37 +295,16 @@ const EditorScreen: React.FC<EditorScreenProps> = ({ navigation, route }) => {
                 resizeMode="contain"
               />
 
-              {/* Top Text */}
-              {topText ? (
-                <Text
-                  style={[
-                    styles.memeText,
-                    styles.topText,
-                    {
-                      fontSize,
-                      color: textColor,
-                    },
-                  ]}
-                >
-                  {topText.toUpperCase()}
-                </Text>
-              ) : null}
-
-              {/* Bottom Text */}
-              {bottomText ? (
-                <Text
-                  style={[
-                    styles.memeText,
-                    styles.bottomText,
-                    {
-                      fontSize,
-                      color: textColor,
-                    },
-                  ]}
-                >
-                  {bottomText.toUpperCase()}
-                </Text>
-              ) : null}
+              {/* Draggable Text Boxes */}
+              {history.present.map(textBox => (
+                <DraggableText
+                  key={textBox.id}
+                  textBox={textBox}
+                  isSelected={selectedTextId === textBox.id}
+                  onSelect={() => setSelectedTextId(textBox.id)}
+                  onPositionUpdate={(x, y) => updateTextPosition(textBox.id, x, y)}
+                />
+              ))}
 
               {/* Watermark */}
               {showWatermark && (
@@ -219,80 +314,124 @@ const EditorScreen: React.FC<EditorScreenProps> = ({ navigation, route }) => {
           </ViewShot>
         </View>
 
-        {/* Text Inputs */}
+        {/* Controls */}
         <View style={styles.controlsContainer}>
-          <Text style={styles.sectionTitle}>Add Text</Text>
-
-          <View style={styles.inputContainer}>
-            <Ionicons name="text" size={20} color={colors.primary} />
-            <TextInput
-              style={styles.textInput}
-              placeholder="Top text"
-              value={topText}
-              onChangeText={setTopText}
-              placeholderTextColor={colors.textLight}
-              maxLength={50}
-            />
-          </View>
-
-          <View style={styles.inputContainer}>
-            <Ionicons name="text" size={20} color={colors.primary} />
-            <TextInput
-              style={styles.textInput}
-              placeholder="Bottom text"
-              value={bottomText}
-              onChangeText={setBottomText}
-              placeholderTextColor={colors.textLight}
-              maxLength={50}
-            />
-          </View>
-
-          {/* Font Size Control */}
-          <Text style={styles.controlLabel}>Font Size: {fontSize}</Text>
-          <View style={styles.sliderContainer}>
-            <TouchableOpacity
-              onPress={() => setFontSize(Math.max(TEXT_CONFIG.minFontSize, fontSize - 5))}
-              style={styles.sliderButton}
-            >
-              <Ionicons name="remove-circle" size={32} color={colors.primary} />
-            </TouchableOpacity>
-            <View style={styles.sliderBar}>
-              <View
-                style={[
-                  styles.sliderFill,
-                  {
-                    width: `${
-                      ((fontSize - TEXT_CONFIG.minFontSize) /
-                        (TEXT_CONFIG.maxFontSize - TEXT_CONFIG.minFontSize)) *
-                      100
-                    }%`,
-                  },
-                ]}
-              />
-            </View>
-            <TouchableOpacity
-              onPress={() => setFontSize(Math.min(TEXT_CONFIG.maxFontSize, fontSize + 5))}
-              style={styles.sliderButton}
-            >
-              <Ionicons name="add-circle" size={32} color={colors.primary} />
-            </TouchableOpacity>
-          </View>
-
-          {/* Color Picker */}
-          <Text style={styles.controlLabel}>Text Color</Text>
-          <View style={styles.colorPicker}>
-            {textColors.map((color) => (
+          {/* Undo/Redo and Add Text */}
+          <View style={styles.topControls}>
+            <View style={styles.undoRedoContainer}>
               <TouchableOpacity
-                key={color}
-                style={[
-                  styles.colorOption,
-                  { backgroundColor: color },
-                  textColor === color && styles.colorOptionSelected,
-                ]}
-                onPress={() => setTextColor(color)}
-              />
-            ))}
+                onPress={undo}
+                disabled={history.past.length === 0}
+                style={[styles.iconButton, history.past.length === 0 && styles.iconButtonDisabled]}
+              >
+                <Ionicons name="arrow-undo" size={24} color={history.past.length === 0 ? colors.textLight : colors.primary} />
+              </TouchableOpacity>
+              <TouchableOpacity
+                onPress={redo}
+                disabled={history.future.length === 0}
+                style={[styles.iconButton, history.future.length === 0 && styles.iconButtonDisabled]}
+              >
+                <Ionicons name="arrow-redo" size={24} color={history.future.length === 0 ? colors.textLight : colors.primary} />
+              </TouchableOpacity>
+            </View>
+
+            <TouchableOpacity onPress={addTextBox} style={styles.addTextButton}>
+              <Ionicons name="add-circle" size={24} color={colors.white} />
+              <Text style={styles.addTextButtonText}>Add Text</Text>
+            </TouchableOpacity>
           </View>
+
+          {/* Selected Text Controls */}
+          {selectedText && (
+            <View style={styles.selectedTextControls}>
+              <Text style={styles.sectionTitle}>Edit Text</Text>
+
+              <TouchableOpacity
+                onPress={handleEditText}
+                style={styles.editButton}
+              >
+                <Ionicons name="pencil" size={20} color={colors.primary} />
+                <Text style={styles.editButtonText}>{selectedText.text}</Text>
+              </TouchableOpacity>
+
+              {/* Font Size Control */}
+              <Text style={styles.controlLabel}>Font Size: {selectedText.fontSize}</Text>
+              <View style={styles.sliderContainer}>
+                <TouchableOpacity
+                  onPress={() => updateTextBox(selectedText.id, {
+                    fontSize: Math.max(TEXT_CONFIG.minFontSize, selectedText.fontSize - 5)
+                  })}
+                  style={styles.sliderButton}
+                >
+                  <Ionicons name="remove-circle" size={32} color={colors.primary} />
+                </TouchableOpacity>
+                <View style={styles.sliderBar}>
+                  <View
+                    style={[
+                      styles.sliderFill,
+                      {
+                        width: `${
+                          ((selectedText.fontSize - TEXT_CONFIG.minFontSize) /
+                            (TEXT_CONFIG.maxFontSize - TEXT_CONFIG.minFontSize)) *
+                          100
+                        }%`,
+                      },
+                    ]}
+                  />
+                </View>
+                <TouchableOpacity
+                  onPress={() => updateTextBox(selectedText.id, {
+                    fontSize: Math.min(TEXT_CONFIG.maxFontSize, selectedText.fontSize + 5)
+                  })}
+                  style={styles.sliderButton}
+                >
+                  <Ionicons name="add-circle" size={32} color={colors.primary} />
+                </TouchableOpacity>
+              </View>
+
+              {/* Color Picker */}
+              <Text style={styles.controlLabel}>Text Color</Text>
+              <View style={styles.colorPicker}>
+                {textColors.map((color) => (
+                  <TouchableOpacity
+                    key={color}
+                    style={[
+                      styles.colorOption,
+                      { backgroundColor: color },
+                      selectedText.color === color && styles.colorOptionSelected,
+                    ]}
+                    onPress={() => updateTextBox(selectedText.id, { color })}
+                  />
+                ))}
+              </View>
+
+              {/* Delete Button */}
+              <TouchableOpacity
+                onPress={() => deleteTextBox(selectedText.id)}
+                style={styles.deleteButton}
+              >
+                <Ionicons name="trash" size={20} color={colors.white} />
+                <Text style={styles.deleteButtonText}>Delete Text</Text>
+              </TouchableOpacity>
+            </View>
+          )}
+
+          {/* Hint when no text selected */}
+          {!selectedText && history.present.length === 0 && (
+            <View style={styles.hintContainer}>
+              <Ionicons name="information-circle" size={48} color={colors.textLight} />
+              <Text style={styles.hintText}>Tap "Add Text" to get started!</Text>
+              <Text style={styles.hintSubtext}>You can add unlimited text boxes and drag them anywhere</Text>
+            </View>
+          )}
+
+          {!selectedText && history.present.length > 0 && (
+            <View style={styles.hintContainer}>
+              <Ionicons name="hand-left" size={48} color={colors.textLight} />
+              <Text style={styles.hintText}>Tap a text box to edit it</Text>
+              <Text style={styles.hintSubtext}>Drag text boxes to reposition them</Text>
+            </View>
+          )}
 
           {/* Watermark Control */}
           {showWatermark && (
@@ -327,9 +466,116 @@ const EditorScreen: React.FC<EditorScreenProps> = ({ navigation, route }) => {
         </View>
       </ScrollView>
 
+      {/* Text Editor Modal */}
+      <Modal
+        visible={showTextEditor}
+        transparent
+        animationType="slide"
+        onRequestClose={() => setShowTextEditor(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContent}>
+            <Text style={styles.modalTitle}>Edit Text</Text>
+            <TextInput
+              style={styles.modalInput}
+              value={editingText}
+              onChangeText={setEditingText}
+              placeholder="Enter text"
+              multiline
+              autoFocus
+              maxLength={100}
+            />
+            <View style={styles.modalButtons}>
+              <TouchableOpacity
+                onPress={() => setShowTextEditor(false)}
+                style={[styles.modalButton, styles.modalCancelButton]}
+              >
+                <Text style={styles.modalCancelText}>Cancel</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                onPress={handleSaveText}
+                style={[styles.modalButton, styles.modalSaveButton]}
+              >
+                <Text style={styles.modalSaveText}>Save</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
+
       {/* Ad Banner */}
       <AdBanner />
-    </View>
+    </GestureHandlerRootView>
+  );
+};
+
+// Draggable Text Component
+interface DraggableTextProps {
+  textBox: MemeText;
+  isSelected: boolean;
+  onSelect: () => void;
+  onPositionUpdate: (x: number, y: number) => void;
+}
+
+const DraggableText: React.FC<DraggableTextProps> = ({
+  textBox,
+  isSelected,
+  onSelect,
+  onPositionUpdate
+}) => {
+  const translateX = useSharedValue(textBox.x);
+  const translateY = useSharedValue(textBox.y);
+
+  React.useEffect(() => {
+    translateX.value = textBox.x;
+    translateY.value = textBox.y;
+  }, [textBox.x, textBox.y]);
+
+  const gestureHandler = useAnimatedGestureHandler<PanGestureHandlerGestureEvent>({
+    onStart: (_, ctx: any) => {
+      ctx.startX = translateX.value;
+      ctx.startY = translateY.value;
+      runOnJS(onSelect)();
+    },
+    onActive: (event, ctx: any) => {
+      translateX.value = ctx.startX + event.translationX;
+      translateY.value = ctx.startY + event.translationY;
+    },
+    onEnd: () => {
+      runOnJS(onPositionUpdate)(translateX.value, translateY.value);
+    },
+  });
+
+  const animatedStyle = useAnimatedStyle(() => ({
+    transform: [
+      { translateX: translateX.value },
+      { translateY: translateY.value },
+    ],
+  }));
+
+  return (
+    <PanGestureHandler onGestureEvent={gestureHandler}>
+      <Animated.View
+        style={[
+          styles.draggableContainer,
+          animatedStyle,
+          isSelected && styles.selectedTextBox,
+        ]}
+      >
+        <Text
+          style={[
+            styles.memeText,
+            {
+              fontSize: textBox.fontSize,
+              color: textBox.color,
+              textShadowColor: textBox.strokeColor,
+            },
+          ]}
+        >
+          {textBox.text.toUpperCase()}
+        </Text>
+      </Animated.View>
+    </PanGestureHandler>
   );
 };
 
@@ -362,22 +608,22 @@ const styles = StyleSheet.create({
     width: '100%',
     height: '100%',
   },
-  memeText: {
+  draggableContainer: {
     position: 'absolute',
-    width: '100%',
-    textAlign: 'center',
+    padding: 8,
+  },
+  selectedTextBox: {
+    borderWidth: 2,
+    borderColor: colors.primary,
+    borderStyle: 'dashed',
+    borderRadius: 4,
+    backgroundColor: 'rgba(74, 144, 226, 0.1)',
+  },
+  memeText: {
     fontWeight: '900',
     textTransform: 'uppercase',
-    paddingHorizontal: 16,
-    textShadowColor: TEXT_CONFIG.defaultStrokeColor,
     textShadowOffset: { width: 2, height: 2 },
     textShadowRadius: 1,
-  },
-  topText: {
-    top: 20,
-  },
-  bottomText: {
-    bottom: 20,
   },
   watermark: {
     position: 'absolute',
@@ -391,31 +637,74 @@ const styles = StyleSheet.create({
   controlsContainer: {
     paddingHorizontal: 16,
   },
-  sectionTitle: {
-    fontSize: 18,
-    fontWeight: '700',
-    color: colors.text,
+  topControls: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
     marginBottom: 16,
   },
-  inputContainer: {
+  undoRedoContainer: {
     flexDirection: 'row',
-    alignItems: 'center',
+    gap: 8,
+  },
+  iconButton: {
+    padding: 8,
     backgroundColor: colors.white,
-    borderRadius: 12,
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    marginBottom: 12,
+    borderRadius: 8,
     shadowColor: colors.shadow,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
     elevation: 2,
   },
-  textInput: {
+  iconButtonDisabled: {
+    opacity: 0.5,
+  },
+  addTextButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: colors.primary,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    borderRadius: 8,
+    gap: 8,
+  },
+  addTextButtonText: {
+    color: colors.white,
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  selectedTextControls: {
+    backgroundColor: colors.white,
+    borderRadius: 12,
+    padding: 16,
+    marginBottom: 16,
+    shadowColor: colors.shadow,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 2,
+  },
+  sectionTitle: {
+    fontSize: 18,
+    fontWeight: '700',
+    color: colors.text,
+    marginBottom: 16,
+  },
+  editButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: colors.background,
+    borderRadius: 8,
+    padding: 12,
+    marginBottom: 16,
+    gap: 8,
+  },
+  editButtonText: {
     flex: 1,
-    marginLeft: 12,
     fontSize: 16,
     color: colors.text,
+    fontWeight: '600',
   },
   controlLabel: {
     fontSize: 16,
@@ -448,7 +737,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     flexWrap: 'wrap',
     gap: 12,
-    marginBottom: 24,
+    marginBottom: 16,
   },
   colorOption: {
     width: 50,
@@ -460,6 +749,40 @@ const styles = StyleSheet.create({
   colorOptionSelected: {
     borderColor: colors.primary,
     borderWidth: 4,
+  },
+  deleteButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: colors.error,
+    borderRadius: 8,
+    padding: 12,
+    gap: 8,
+  },
+  deleteButtonText: {
+    color: colors.white,
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  hintContainer: {
+    alignItems: 'center',
+    padding: 32,
+    backgroundColor: colors.white,
+    borderRadius: 12,
+    marginBottom: 16,
+  },
+  hintText: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: colors.text,
+    marginTop: 16,
+    textAlign: 'center',
+  },
+  hintSubtext: {
+    fontSize: 14,
+    color: colors.textLight,
+    marginTop: 8,
+    textAlign: 'center',
   },
   watermarkButton: {
     flexDirection: 'row',
@@ -488,6 +811,62 @@ const styles = StyleSheet.create({
   },
   shareButton: {
     flex: 1,
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 16,
+  },
+  modalContent: {
+    backgroundColor: colors.white,
+    borderRadius: 16,
+    padding: 24,
+    width: '100%',
+    maxWidth: 400,
+  },
+  modalTitle: {
+    fontSize: 20,
+    fontWeight: '700',
+    color: colors.text,
+    marginBottom: 16,
+  },
+  modalInput: {
+    backgroundColor: colors.background,
+    borderRadius: 8,
+    padding: 12,
+    fontSize: 16,
+    color: colors.text,
+    minHeight: 100,
+    textAlignVertical: 'top',
+    marginBottom: 16,
+  },
+  modalButtons: {
+    flexDirection: 'row',
+    gap: 12,
+  },
+  modalButton: {
+    flex: 1,
+    padding: 14,
+    borderRadius: 8,
+    alignItems: 'center',
+  },
+  modalCancelButton: {
+    backgroundColor: colors.background,
+  },
+  modalSaveButton: {
+    backgroundColor: colors.primary,
+  },
+  modalCancelText: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: colors.text,
+  },
+  modalSaveText: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: colors.white,
   },
 });
 
