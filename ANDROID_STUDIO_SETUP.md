@@ -144,6 +144,34 @@ Process 'command '.../ndk/.../clang++' finished with non-zero exit value 1
 
 **Important:** New Architecture MUST be disabled (`newArchEnabled=false`) for the build to succeed.
 
+### Android Gradle Plugin Version Incompatibility
+
+**Problem:** Error message in Android Studio:
+```
+The project is using an incompatible version (AGP 8.11.0) of the Android Gradle plugin.
+Latest supported version is AGP 8.10.1
+```
+
+**Solution:**
+
+The project is now configured with AGP 8.10.1. After pulling the latest changes:
+
+1. **In Android Studio:**
+   - File > Invalidate Caches > Invalidate and Restart
+   - Wait for Gradle sync to complete
+
+2. **If issue persists:**
+   - Verify `android/build.gradle` has:
+     ```gradle
+     classpath('com.android.tools.build:gradle:8.10.1')
+     ```
+   - Clean rebuild:
+     ```bash
+     cd android
+     ./gradlew clean
+     cd ..
+     ```
+
 ### Gradle Build Fails
 
 **Problem:** "Could not resolve all dependencies"
