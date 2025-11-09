@@ -167,6 +167,22 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
         />
       </View>
 
+      {/* Trending from Reddit Button */}
+      <TouchableOpacity
+        style={styles.trendingButton}
+        onPress={() => navigation.navigate('Trending')}
+        activeOpacity={0.8}
+      >
+        <View style={styles.trendingContent}>
+          <Ionicons name="trending-up" size={24} color="#FF4500" />
+          <View style={styles.trendingTextContainer}>
+            <Text style={styles.trendingTitle}>Trending from Reddit</Text>
+            <Text style={styles.trendingSubtitle}>Get inspired by popular memes 🔥</Text>
+          </View>
+        </View>
+        <Ionicons name="chevron-forward" size={24} color={colors.textLight} />
+      </TouchableOpacity>
+
       <Text style={styles.sectionTitle}>
         {filteredTemplates.length} Templates
       </Text>
@@ -252,6 +268,41 @@ const styles = StyleSheet.create({
   },
   uploadButton: {
     flex: 1,
+  },
+  trendingButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    backgroundColor: colors.white,
+    borderRadius: 12,
+    padding: 16,
+    marginBottom: 16,
+    borderWidth: 2,
+    borderColor: '#FF4500',
+    shadowColor: '#FF4500',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  trendingContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+    flex: 1,
+  },
+  trendingTextContainer: {
+    flex: 1,
+  },
+  trendingTitle: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: colors.text,
+    marginBottom: 4,
+  },
+  trendingSubtitle: {
+    fontSize: 13,
+    color: colors.textLight,
   },
   sectionTitle: {
     fontSize: 18,

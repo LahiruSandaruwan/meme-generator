@@ -63,6 +63,7 @@ export type RootStackParamList = {
   };
   PrivacyPolicy: undefined;
   Premium: undefined;
+  Trending: undefined;
 };
 
 export type MainTabParamList = {

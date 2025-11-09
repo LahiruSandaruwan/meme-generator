@@ -14,6 +14,7 @@ import GalleryScreen from '../screens/GalleryScreen';
 import SettingsScreen from '../screens/SettingsScreen';
 import PrivacyPolicyScreen from '../screens/PrivacyPolicyScreen';
 import PremiumScreen from '../screens/PremiumScreen';
+import { TrendingScreen } from '../screens/TrendingScreen';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 const Tab = createBottomTabNavigator<MainTabParamList>();
@@ -131,6 +132,13 @@ export default function AppNavigator() {
           options={{
             headerShown: false,
             presentation: 'modal',
+          }}
+        />
+        <Stack.Screen
+          name="Trending"
+          component={TrendingScreen}
+          options={{
+            headerShown: false,
           }}
         />
       </Stack.Navigator>
