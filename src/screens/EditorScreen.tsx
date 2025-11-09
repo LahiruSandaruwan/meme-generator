@@ -31,6 +31,7 @@ import { FontPicker } from '../components/FontPicker';
 import { ImageFilters, ImageFilter } from '../components/ImageFilters';
 import { Sticker } from '../utils/stickerData';
 import { Font, getFontFamily } from '../utils/fontData';
+import { shareToAny, getSuggestedHashtags } from '../utils/socialShare';
 import { adManager } from '../utils/adManager';
 import { premiumManager } from '../utils/premiumManager';
 
@@ -297,21 +298,22 @@ const EditorScreen: React.FC<EditorScreenProps> = ({ navigation, route }) => {
 
       const uri = await viewShotRef.current.capture();
 
-      const isAvailable = await Sharing.isAvailableAsync();
-      if (!isAvailable) {
-        Alert.alert('Error', 'Sharing is not available on this device');
-        return;
-      }
+      // Get suggested hashtags based on template
+      const hashtags = getSuggestedHashtags(route.params.templateName);
 
-      await Sharing.shareAsync(uri, {
-        mimeType: 'image/jpeg',
-        dialogTitle: 'Share your meme',
+      // Share with enhanced options
+      const success = await shareToAny(uri, {
+        title: 'Share your meme',
+        message: 'Check out this meme! 😂',
+        hashtags,
       });
 
-      // Show interstitial ad after sharing
-      setTimeout(() => {
-        adManager.showInterstitialAd();
-      }, 500);
+      if (success) {
+        // Show interstitial ad after sharing
+        setTimeout(() => {
+          adManager.showInterstitialAd();
+        }, 500);
+      }
     } catch (error) {
       if (__DEV__) { console.error('Error sharing meme:', error); }
       Alert.alert('Error', 'Failed to share meme. Please try again.');
