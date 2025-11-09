@@ -157,6 +157,27 @@ export const ImageFilters: React.FC<ImageFiltersProps> = ({
             {/* Preset Filters */}
             <View style={styles.presetsSection}>
               <Text style={styles.presetsTitle}>Quick Presets</Text>
+
+              {/* Auto-Enhance - Featured */}
+              <TouchableOpacity
+                style={[styles.autoEnhanceButton]}
+                onPress={() => {
+                  // Smart auto-enhance algorithm
+                  setBrightness(0.15);
+                  setContrast(0.2);
+                  setSaturation(1.15);
+                }}
+              >
+                <View style={styles.autoEnhanceIcon}>
+                  <Ionicons name="flash" size={28} color="#FFD700" />
+                </View>
+                <View style={styles.autoEnhanceContent}>
+                  <Text style={styles.autoEnhanceTitle}>Auto-Enhance</Text>
+                  <Text style={styles.autoEnhanceSubtitle}>Smart AI-powered enhancement</Text>
+                </View>
+                <Ionicons name="chevron-forward" size={24} color={colors.textLight} />
+              </TouchableOpacity>
+
               <View style={styles.presetsGrid}>
                 <TouchableOpacity
                   style={styles.presetButton}
@@ -204,6 +225,30 @@ export const ImageFilters: React.FC<ImageFiltersProps> = ({
                 >
                   <Ionicons name="remove-circle-outline" size={24} color={colors.textLight} />
                   <Text style={styles.presetText}>B&W</Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity
+                  style={styles.presetButton}
+                  onPress={() => {
+                    setBrightness(0.25);
+                    setContrast(0);
+                    setSaturation(1.0);
+                  }}
+                >
+                  <Ionicons name="sunny" size={24} color={colors.primary} />
+                  <Text style={styles.presetText}>Bright</Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity
+                  style={styles.presetButton}
+                  onPress={() => {
+                    setBrightness(0);
+                    setContrast(0.4);
+                    setSaturation(1.0);
+                  }}
+                >
+                  <Ionicons name="contrast" size={24} color={colors.primary} />
+                  <Text style={styles.presetText}>Sharp</Text>
                 </TouchableOpacity>
               </View>
             </View>
@@ -336,6 +381,43 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     color: colors.text,
     marginBottom: 12,
+  },
+  autoEnhanceButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#FFF9E6',
+    borderRadius: 12,
+    padding: 16,
+    marginBottom: 16,
+    borderWidth: 2,
+    borderColor: '#FFD700',
+    shadowColor: '#FFD700',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  autoEnhanceIcon: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    backgroundColor: colors.white,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: 12,
+  },
+  autoEnhanceContent: {
+    flex: 1,
+  },
+  autoEnhanceTitle: {
+    fontSize: 18,
+    fontWeight: '700',
+    color: colors.text,
+    marginBottom: 2,
+  },
+  autoEnhanceSubtitle: {
+    fontSize: 12,
+    color: colors.textLight,
   },
   presetsGrid: {
     flexDirection: 'row',
