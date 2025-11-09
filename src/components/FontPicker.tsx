@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import {
   View,
   Text,
@@ -16,8 +16,16 @@ import {
   fonts,
   getFontsByCategory,
   searchFonts,
+  getPopularFonts,
+  getFontById,
   Font,
 } from '../utils/fontData';
+import {
+  getRecentlyUsedFonts,
+  addRecentlyUsedFont,
+  getFavoriteFonts,
+  toggleFavoriteFont,
+} from '../utils/fontPreferences';
 
 interface FontPickerProps {
   visible: boolean;
@@ -32,8 +40,36 @@ export const FontPicker: React.FC<FontPickerProps> = ({
   onFontSelect,
   currentFontId,
 }) => {
-  const [selectedCategory, setSelectedCategory] = useState('Classic');
+  const [selectedCategory, setSelectedCategory] = useState('Meme');
   const [searchQuery, setSearchQuery] = useState('');
+  const [recentFontIds, setRecentFontIds] = useState<string[]>([]);
+  const [favoriteFontIds, setFavoriteFontIds] = useState<string[]>([]);
+  const [localFavorites, setLocalFavorites] = useState<Set<string>>(new Set());
+
+  // Load recent and favorite fonts
+  useEffect(() => {
+    if (visible) {
+      loadFontPreferences();
+    }
+  }, [visible]);
+
+  const loadFontPreferences = async () => {
+    const recent = await getRecentlyUsedFonts();
+    const favorites = await getFavoriteFonts();
+    setRecentFontIds(recent);
+    setFavoriteFontIds(favorites);
+    setLocalFavorites(new Set(favorites));
+  };
+
+  const recentFonts = useMemo(() => {
+    return recentFontIds.map(id => getFontById(id)).filter(Boolean) as Font[];
+  }, [recentFontIds]);
+
+  const favoriteFonts = useMemo(() => {
+    return favoriteFontIds.map(id => getFontById(id)).filter(Boolean) as Font[];
+  }, [favoriteFontIds]);
+
+  const popularFonts = useMemo(() => getPopularFonts(), []);
 
   const displayedFonts = useMemo(() => {
     if (searchQuery.trim()) {
@@ -42,13 +78,34 @@ export const FontPicker: React.FC<FontPickerProps> = ({
     return getFontsByCategory(selectedCategory);
   }, [selectedCategory, searchQuery]);
 
-  const handleFontPress = (font: Font) => {
+  const handleFontPress = async (font: Font) => {
+    await addRecentlyUsedFont(font.id);
     onFontSelect(font);
     onClose();
   };
 
-  const renderFont = ({ item }: { item: Font }) => (
+  const handleToggleFavorite = async (fontId: string, event: any) => {
+    event.stopPropagation();
+    const newState = await toggleFavoriteFont(fontId);
+
+    // Update local state immediately for UI responsiveness
+    setLocalFavorites(prev => {
+      const newSet = new Set(prev);
+      if (newState) {
+        newSet.add(fontId);
+      } else {
+        newSet.delete(fontId);
+      }
+      return newSet;
+    });
+
+    // Reload preferences
+    await loadFontPreferences();
+  };
+
+  const renderFontItem = (item: Font, showFavoriteButton: boolean = true) => (
     <TouchableOpacity
+      key={item.id}
       style={[
         styles.fontItem,
         currentFontId === item.id && styles.fontItemSelected,
@@ -57,7 +114,25 @@ export const FontPicker: React.FC<FontPickerProps> = ({
       activeOpacity={0.7}
     >
       <View style={styles.fontItemContent}>
-        <Text style={styles.fontName}>{item.name}</Text>
+        <View style={styles.fontHeader}>
+          <Text style={styles.fontName}>{item.name}</Text>
+          {showFavoriteButton && (
+            <TouchableOpacity
+              onPress={(e) => handleToggleFavorite(item.id, e)}
+              style={styles.favoriteButton}
+              hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+            >
+              <Ionicons
+                name={localFavorites.has(item.id) ? 'star' : 'star-outline'}
+                size={20}
+                color={localFavorites.has(item.id) ? '#FFD700' : colors.textLight}
+              />
+            </TouchableOpacity>
+          )}
+        </View>
+        {item.description && (
+          <Text style={styles.fontDescription}>{item.description}</Text>
+        )}
         <Text
           style={[
             styles.fontPreview,
@@ -73,6 +148,23 @@ export const FontPicker: React.FC<FontPickerProps> = ({
     </TouchableOpacity>
   );
 
+  const renderSection = (title: string, fonts: Font[], icon: string) => {
+    if (fonts.length === 0) return null;
+
+    return (
+      <View style={styles.section}>
+        <View style={styles.sectionHeader}>
+          <Ionicons name={icon as any} size={20} color={colors.primary} />
+          <Text style={styles.sectionTitle}>{title}</Text>
+          <Text style={styles.sectionCount}>({fonts.length})</Text>
+        </View>
+        <View style={styles.sectionContent}>
+          {fonts.map(font => renderFontItem(font))}
+        </View>
+      </View>
+    );
+  };
+
   return (
     <Modal
       visible={visible}
@@ -84,7 +176,10 @@ export const FontPicker: React.FC<FontPickerProps> = ({
         <View style={styles.modalContent}>
           {/* Header */}
           <View style={styles.header}>
-            <Text style={styles.title}>Choose Font</Text>
+            <View>
+              <Text style={styles.title}>Choose Font</Text>
+              <Text style={styles.subtitle}>{fonts.length} fonts available</Text>
+            </View>
             <TouchableOpacity onPress={onClose} style={styles.closeButton}>
               <Ionicons name="close" size={28} color={colors.text} />
             </TouchableOpacity>
@@ -139,20 +234,52 @@ export const FontPicker: React.FC<FontPickerProps> = ({
           )}
 
           {/* Fonts List */}
-          <FlatList
-            data={displayedFonts}
-            renderItem={renderFont}
-            keyExtractor={(item) => item.id}
-            contentContainerStyle={styles.fontList}
+          <ScrollView
+            style={styles.scrollView}
+            contentContainerStyle={styles.scrollContent}
             showsVerticalScrollIndicator={false}
-            ListEmptyComponent={
-              <View style={styles.emptyContainer}>
-                <Ionicons name="text-outline" size={48} color={colors.textLight} />
-                <Text style={styles.emptyText}>No fonts found</Text>
-                <Text style={styles.emptySubtext}>Try a different search term</Text>
+          >
+            {!searchQuery && (
+              <>
+                {/* Recently Used Section */}
+                {renderSection('Recently Used', recentFonts, 'time')}
+
+                {/* Favorites Section */}
+                {renderSection('Favorites', favoriteFonts, 'star')}
+
+                {/* Popular Fonts Section */}
+                {selectedCategory === 'Meme' && renderSection('Popular', popularFonts, 'trending-up')}
+              </>
+            )}
+
+            {/* Main Font List or Search Results */}
+            <View style={styles.section}>
+              {searchQuery && (
+                <View style={styles.sectionHeader}>
+                  <Ionicons name="search" size={20} color={colors.primary} />
+                  <Text style={styles.sectionTitle}>Search Results</Text>
+                  <Text style={styles.sectionCount}>({displayedFonts.length})</Text>
+                </View>
+              )}
+              {!searchQuery && (
+                <View style={styles.sectionHeader}>
+                  <Text style={styles.sectionTitle}>{selectedCategory} Fonts</Text>
+                  <Text style={styles.sectionCount}>({displayedFonts.length})</Text>
+                </View>
+              )}
+              <View style={styles.sectionContent}>
+                {displayedFonts.length > 0 ? (
+                  displayedFonts.map(font => renderFontItem(font))
+                ) : (
+                  <View style={styles.emptyContainer}>
+                    <Ionicons name="text-outline" size={48} color={colors.textLight} />
+                    <Text style={styles.emptyText}>No fonts found</Text>
+                    <Text style={styles.emptySubtext}>Try a different search term</Text>
+                  </View>
+                )}
               </View>
-            }
-          />
+            </View>
+          </ScrollView>
         </View>
       </View>
     </Modal>
@@ -169,7 +296,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.white,
     borderTopLeftRadius: 24,
     borderTopRightRadius: 24,
-    maxHeight: '85%',
+    maxHeight: '90%',
     paddingBottom: 16,
   },
   header: {
@@ -184,6 +311,11 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: '700',
     color: colors.text,
+  },
+  subtitle: {
+    fontSize: 13,
+    color: colors.textLight,
+    marginTop: 2,
   },
   closeButton: {
     padding: 4,
@@ -228,9 +360,33 @@ const styles = StyleSheet.create({
   categoryTextActive: {
     color: colors.white,
   },
-  fontList: {
+  scrollView: {
+    flex: 1,
+  },
+  scrollContent: {
     paddingHorizontal: 16,
-    paddingTop: 8,
+    paddingBottom: 16,
+  },
+  section: {
+    marginBottom: 24,
+  },
+  sectionHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 12,
+    gap: 8,
+  },
+  sectionTitle: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: colors.text,
+  },
+  sectionCount: {
+    fontSize: 14,
+    color: colors.textLight,
+  },
+  sectionContent: {
+    gap: 12,
   },
   fontItem: {
     flexDirection: 'row',
@@ -239,7 +395,6 @@ const styles = StyleSheet.create({
     backgroundColor: colors.background,
     borderRadius: 12,
     padding: 16,
-    marginBottom: 12,
     borderWidth: 2,
     borderColor: 'transparent',
   },
@@ -249,17 +404,33 @@ const styles = StyleSheet.create({
   },
   fontItemContent: {
     flex: 1,
-    gap: 8,
+    gap: 6,
+  },
+  fontHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
   },
   fontName: {
     fontSize: 16,
     fontWeight: '600',
     color: colors.text,
+    flex: 1,
+  },
+  favoriteButton: {
+    padding: 4,
+    marginLeft: 8,
+  },
+  fontDescription: {
+    fontSize: 12,
+    color: colors.textLight,
+    fontStyle: 'italic',
   },
   fontPreview: {
     fontSize: 18,
     fontWeight: '700',
     color: colors.textLight,
+    marginTop: 4,
   },
   emptyContainer: {
     alignItems: 'center',
