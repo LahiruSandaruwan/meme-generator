@@ -265,7 +265,7 @@ export const memeTemplates: MemeTemplate[] = [
   {
     id: '100777631',
     name: 'Is This a Pigeon',
-    url: 'https://i.imgflip.com/1ihzfe.jpg',
+    url: 'https://i.imgflip.com/1bgw.jpg',
     category: 'Classic',
     width: 1587,
     height: 1425,
@@ -782,7 +782,7 @@ export const memeTemplates: MemeTemplate[] = [
   {
     id: '6351542',
     name: 'Gorilla Business',
-    url: 'https://i.imgflip.com/3r0xj6.jpg',
+    url: 'https://i.imgflip.com/3h7ay.jpg',
     category: 'Animals',
     width: 498,
     height: 388,
