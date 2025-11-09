@@ -372,7 +372,7 @@ const EditorScreen: React.FC<EditorScreenProps> = ({ navigation, route }) => {
                 style={[
                   styles.memeImage,
                   {
-                    opacity: 1 + imageFilters.brightness * 0.5,
+                    opacity: Math.max(0.1, Math.min(1, 1 + imageFilters.brightness * 0.5)),
                   },
                 ]}
                 resizeMode="contain"
@@ -386,9 +386,9 @@ const EditorScreen: React.FC<EditorScreenProps> = ({ navigation, route }) => {
                     {
                       backgroundColor:
                         imageFilters.saturation < 0.5
-                          ? 'rgba(128, 128, 128, ' + (1 - imageFilters.saturation) * 0.5 + ')'
+                          ? `rgba(128, 128, 128, ${(1 - imageFilters.saturation) * 0.5})`
                           : 'transparent',
-                      opacity: Math.abs(imageFilters.contrast) * 0.3 + 0.7,
+                      opacity: Math.max(0.1, Math.min(1, Math.abs(imageFilters.contrast) * 0.3 + 0.7)),
                     },
                   ]}
                   pointerEvents="none"
@@ -396,31 +396,35 @@ const EditorScreen: React.FC<EditorScreenProps> = ({ navigation, route }) => {
               )}
 
               {/* Draggable Text Boxes */}
-              {history.present.map(textBox => (
-                <DraggableText
-                  key={textBox.id}
-                  textBox={textBox}
-                  isSelected={selectedTextId === textBox.id}
-                  onSelect={() => {
-                    setSelectedTextId(textBox.id);
-                    setSelectedStickerId(null);
-                  }}
-                  onPositionUpdate={(x, y) => updateTextPosition(textBox.id, x, y)}
-                />
+              {Array.isArray(history.present) && history.present.map(textBox => (
+                textBox && textBox.id ? (
+                  <DraggableText
+                    key={textBox.id}
+                    textBox={textBox}
+                    isSelected={selectedTextId === textBox.id}
+                    onSelect={() => {
+                      setSelectedTextId(textBox.id);
+                      setSelectedStickerId(null);
+                    }}
+                    onPositionUpdate={(x, y) => updateTextPosition(textBox.id, x, y)}
+                  />
+                ) : null
               ))}
 
               {/* Draggable Stickers */}
-              {stickers.map(sticker => (
-                <DraggableSticker
-                  key={sticker.id}
-                  sticker={sticker}
-                  isSelected={selectedStickerId === sticker.id}
-                  onSelect={() => {
-                    setSelectedStickerId(sticker.id);
-                    setSelectedTextId(null);
-                  }}
-                  onPositionUpdate={(x, y) => updateStickerPosition(sticker.id, x, y)}
-                />
+              {Array.isArray(stickers) && stickers.map(sticker => (
+                sticker && sticker.id ? (
+                  <DraggableSticker
+                    key={sticker.id}
+                    sticker={sticker}
+                    isSelected={selectedStickerId === sticker.id}
+                    onSelect={() => {
+                      setSelectedStickerId(sticker.id);
+                      setSelectedTextId(null);
+                    }}
+                    onPositionUpdate={(x, y) => updateStickerPosition(sticker.id, x, y)}
+                  />
+                ) : null
               ))}
 
               {/* Watermark */}
@@ -799,7 +803,7 @@ const EditorScreen: React.FC<EditorScreenProps> = ({ navigation, route }) => {
         visible={showFontPicker}
         onClose={() => setShowFontPicker(false)}
         onFontSelect={handleFontSelect}
-        currentFontId={selectedText?.fontFamily}
+        currentFontId={selectedText?.fontFamily || 'default'}
       />
 
       {/* Image Filters Modal */}
@@ -934,19 +938,19 @@ const DraggableSticker: React.FC<DraggableStickerProps> = ({
     const { state, translationX, translationY } = event.nativeEvent;
 
     if (state === 2) { // BEGAN
-      startPos.current = { x: sticker.x, y: sticker.y };
+      startPos.current = { x: sticker.x || 0, y: sticker.y || 0 };
       onSelect();
     } else if (state === 4) { // ACTIVE
-      const newX = startPos.current.x + translationX;
-      const newY = startPos.current.y + translationY;
+      const newX = startPos.current.x + (translationX || 0);
+      const newY = startPos.current.y + (translationY || 0);
       onPositionUpdate(newX, newY);
     }
   };
 
   const transform = [
-    { translateX: sticker.x },
-    { translateY: sticker.y },
-    { rotate: `${sticker.rotation}deg` },
+    { translateX: sticker.x || 0 },
+    { translateY: sticker.y || 0 },
+    { rotate: `${sticker.rotation || 0}deg` },
   ];
 
   return (
@@ -958,8 +962,8 @@ const DraggableSticker: React.FC<DraggableStickerProps> = ({
           isSelected && styles.selectedStickerBox,
         ]}
       >
-        <Text style={{ fontSize: sticker.size }}>
-          {sticker.emoji}
+        <Text style={{ fontSize: sticker.size || 80 }}>
+          {sticker.emoji || '❓'}
         </Text>
       </View>
     </PanGestureHandler>
