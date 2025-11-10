@@ -18,6 +18,7 @@ import * as Sharing from 'expo-sharing';
 import ViewShot from 'react-native-view-shot';
 import { GestureHandlerRootView, PanGestureHandler, PanGestureHandlerGestureEvent } from 'react-native-gesture-handler';
 import { Animated } from 'react-native';
+import Svg, { Path } from 'react-native-svg';
 import { colors } from '../constants/colors';
 import { RootStackParamList, MemeText, MemeSticker, EditorHistory } from '../types';
 import { saveMeme } from '../utils/storage';
@@ -29,8 +30,11 @@ import { VoiceInput } from '../components/VoiceInput';
 import { StickerPicker } from '../components/StickerPicker';
 import { FontPicker } from '../components/FontPicker';
 import { ImageFilters, ImageFilter } from '../components/ImageFilters';
+import { ShapeSelector } from '../components/ShapeSelector';
+import { FrameSelector } from '../components/FrameSelector';
 import { Sticker } from '../utils/stickerData';
 import { Font, getFontFamily } from '../utils/fontData';
+import { Shape, Frame } from '../utils/shapes';
 import { shareToAny, getSuggestedHashtags } from '../utils/socialShare';
 import { adManager } from '../utils/adManager';
 import { premiumManager } from '../utils/premiumManager';
@@ -79,6 +83,14 @@ const EditorScreen: React.FC<EditorScreenProps> = ({ navigation, route }) => {
     saturation: 1,
   });
   const [showImageFilters, setShowImageFilters] = useState(false);
+
+  // Shapes state
+  const [shapes, setShapes] = useState<Shape[]>([]);
+  const [showShapeSelector, setShowShapeSelector] = useState(false);
+
+  // Frame state
+  const [frame, setFrame] = useState<Frame | null>(null);
+  const [showFrameSelector, setShowFrameSelector] = useState(false);
 
   const textColors = ['#FFFFFF', '#000000', '#FF0000', '#FFFF00', '#00FF00', '#0000FF'];
 
@@ -220,6 +232,20 @@ const EditorScreen: React.FC<EditorScreenProps> = ({ navigation, route }) => {
   }, []);
 
   const selectedSticker = stickers.find(s => s.id === selectedStickerId);
+
+  // Shape management
+  const handleAddShape = useCallback((shape: Shape) => {
+    setShapes(prev => [...prev, shape]);
+  }, []);
+
+  const deleteShape = useCallback((id: string) => {
+    setShapes(prev => prev.filter(s => s.id !== id));
+  }, []);
+
+  // Frame management
+  const handleSelectFrame = useCallback((selectedFrame: Frame | null) => {
+    setFrame(selectedFrame);
+  }, []);
 
   // Font management
   const handleFontSelect = useCallback((font: Font) => {
@@ -429,6 +455,41 @@ const EditorScreen: React.FC<EditorScreenProps> = ({ navigation, route }) => {
                 ) : null
               ))}
 
+              {/* Shapes */}
+              {Array.isArray(shapes) && shapes.map(shape => {
+                const { SHAPE_PATHS } = require('../utils/shapes');
+                const path = SHAPE_PATHS[shape.type];
+                return shape && shape.id ? (
+                  <View
+                    key={shape.id}
+                    style={{
+                      position: 'absolute',
+                      left: shape.x,
+                      top: shape.y,
+                      width: shape.width,
+                      height: shape.height,
+                      transform: [{ rotate: `${shape.rotation}deg` }],
+                    }}
+                  >
+                    <Svg
+                      width={shape.width}
+                      height={shape.height}
+                      viewBox="0 0 100 100"
+                    >
+                      <Path
+                        d={path}
+                        stroke={shape.color}
+                        strokeWidth={shape.strokeWidth}
+                        fill={shape.fillColor || 'transparent'}
+                        strokeLinejoin="round"
+                        strokeLinecap="round"
+                        opacity={shape.opacity}
+                      />
+                    </Svg>
+                  </View>
+                ) : null;
+              })}
+
               {/* Watermark */}
               {showWatermark && (
                 <Text style={styles.watermark}>{APP_CONFIG.watermarkText}</Text>
@@ -482,6 +543,20 @@ const EditorScreen: React.FC<EditorScreenProps> = ({ navigation, route }) => {
               >
                 <Ionicons name="happy-outline" size={20} color={colors.white} />
                 <Text style={styles.addStickerButtonText}>Sticker</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                onPress={() => setShowShapeSelector(true)}
+                style={styles.addShapeButton}
+              >
+                <Ionicons name="shapes" size={20} color={colors.white} />
+                <Text style={styles.addShapeButtonText}>Shape</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                onPress={() => setShowFrameSelector(true)}
+                style={styles.addFrameButton}
+              >
+                <Ionicons name="image-outline" size={20} color={colors.white} />
+                <Text style={styles.addFrameButtonText}>Frame</Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -816,6 +891,23 @@ const EditorScreen: React.FC<EditorScreenProps> = ({ navigation, route }) => {
         currentFilters={imageFilters}
       />
 
+      {/* Shape Selector Modal */}
+      <ShapeSelector
+        visible={showShapeSelector}
+        onClose={() => setShowShapeSelector(false)}
+        onAddShape={handleAddShape}
+        canvasWidth={MEME_WIDTH}
+        canvasHeight={MEME_WIDTH}
+      />
+
+      {/* Frame Selector Modal */}
+      <FrameSelector
+        visible={showFrameSelector}
+        onClose={() => setShowFrameSelector(false)}
+        onSelectFrame={handleSelectFrame}
+        currentFrame={frame}
+      />
+
       {/* Ad Banner */}
       <AdBanner />
     </GestureHandlerRootView>
@@ -1072,6 +1164,7 @@ const styles = StyleSheet.create({
   },
   addButtonsContainer: {
     flexDirection: 'row',
+    flexWrap: 'wrap',
     gap: 8,
   },
   addTextButton: {
@@ -1100,6 +1193,36 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   addStickerButtonText: {
+    color: colors.white,
+    fontSize: 14,
+    fontWeight: '600',
+  },
+  addShapeButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#9C27B0',
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+    borderRadius: 8,
+    gap: 6,
+    flex: 1,
+  },
+  addShapeButtonText: {
+    color: colors.white,
+    fontSize: 14,
+    fontWeight: '600',
+  },
+  addFrameButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#FF9800',
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+    borderRadius: 8,
+    gap: 6,
+    flex: 1,
+  },
+  addFrameButtonText: {
     color: colors.white,
     fontSize: 14,
     fontWeight: '600',
