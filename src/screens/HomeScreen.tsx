@@ -20,6 +20,8 @@ import { MemeTemplate } from '../components/MemeTemplate';
 import { CustomButton } from '../components/CustomButton';
 import { DailyChallengeModal } from '../components/DailyChallengeModal';
 import { WhatsAppStickerModal } from '../components/WhatsAppStickerModal';
+import { MemeStatsModal } from '../components/MemeStatsModal';
+import { OfflineIndicator } from '../components/OfflineIndicator';
 
 type HomeScreenNavigationProp = CompositeNavigationProp<
   BottomTabNavigationProp<MainTabParamList, 'Home'>,
@@ -35,6 +37,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [showChallengeModal, setShowChallengeModal] = useState(false);
   const [showWhatsAppModal, setShowWhatsAppModal] = useState(false);
+  const [showStatsModal, setShowStatsModal] = useState(false);
 
   const categories = getCategories();
   const filteredTemplates = searchQuery
@@ -122,6 +125,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
 
   const renderHeader = () => (
     <View style={styles.header}>
+      {/* 1. SEARCH - Quick access at top */}
       <View style={styles.searchContainer}>
         <Ionicons name="search" size={20} color={colors.textLight} />
         <TextInput
@@ -138,6 +142,40 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
         ) : null}
       </View>
 
+      {/* 2. QUICK ACTIONS - Primary user actions */}
+      <View style={styles.uploadButtonsContainer}>
+        <CustomButton
+          title="Upload Photo"
+          onPress={handleUploadCustomImage}
+          icon={<Ionicons name="images" size={20} color={colors.white} style={{ marginRight: 8 }} />}
+          style={styles.uploadButton}
+        />
+        <CustomButton
+          title="Take Photo"
+          onPress={handleTakePhoto}
+          variant="secondary"
+          icon={<Ionicons name="camera" size={20} color={colors.white} style={{ marginRight: 8 }} />}
+          style={styles.uploadButton}
+        />
+      </View>
+
+      {/* 3. TRENDING - Discovery/Inspiration */}
+      <TouchableOpacity
+        style={styles.trendingButton}
+        onPress={() => navigation.navigate('Trending')}
+        activeOpacity={0.8}
+      >
+        <View style={styles.trendingContent}>
+          <Ionicons name="trending-up" size={24} color="#FF4500" />
+          <View style={styles.trendingTextContainer}>
+            <Text style={styles.trendingTitle}>Trending from Reddit</Text>
+            <Text style={styles.trendingSubtitle}>Get inspired by popular memes 🔥</Text>
+          </View>
+        </View>
+        <Ionicons name="chevron-forward" size={24} color={colors.textLight} />
+      </TouchableOpacity>
+
+      {/* 4. CATEGORY FILTER - After primary actions */}
       <View style={styles.categoryContainer}>
         <FlatList
           horizontal
@@ -165,39 +203,13 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
         />
       </View>
 
-      <View style={styles.uploadButtonsContainer}>
-        <CustomButton
-          title="Upload Photo"
-          onPress={handleUploadCustomImage}
-          icon={<Ionicons name="images" size={20} color={colors.white} style={{ marginRight: 8 }} />}
-          style={styles.uploadButton}
-        />
-        <CustomButton
-          title="Take Photo"
-          onPress={handleTakePhoto}
-          variant="secondary"
-          icon={<Ionicons name="camera" size={20} color={colors.white} style={{ marginRight: 8 }} />}
-          style={styles.uploadButton}
-        />
+      {/* SECTION: CREATIVE TOOLS */}
+      <View style={styles.sectionHeader}>
+        <Ionicons name="color-wand" size={18} color={colors.primary} />
+        <Text style={styles.sectionHeaderText}>Creative Tools</Text>
       </View>
 
-      {/* Daily Challenge Button */}
-      <TouchableOpacity
-        style={styles.challengeButton}
-        onPress={() => setShowChallengeModal(true)}
-        activeOpacity={0.8}
-      >
-        <View style={styles.challengeContent}>
-          <Ionicons name="calendar" size={24} color="#FFD700" />
-          <View style={styles.challengeTextContainer}>
-            <Text style={styles.challengeTitle}>Daily Meme Challenge</Text>
-            <Text style={styles.challengeSubtitle}>New creative prompt every day! ⭐</Text>
-          </View>
-        </View>
-        <Ionicons name="chevron-forward" size={24} color={colors.textLight} />
-      </TouchableOpacity>
-
-      {/* Multi-Panel Creator Button */}
+      {/* Multi-Panel Creator */}
       <TouchableOpacity
         style={styles.multiPanelButton}
         onPress={() => navigation.navigate('MultiPanelEditor')}
@@ -213,7 +225,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
         <Ionicons name="chevron-forward" size={24} color={colors.textLight} />
       </TouchableOpacity>
 
-      {/* Instagram Story Button */}
+      {/* Instagram Story */}
       <TouchableOpacity
         style={styles.storyButton}
         onPress={() => navigation.navigate('StoryEditor', {})}
@@ -229,7 +241,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
         <Ionicons name="chevron-forward" size={24} color={colors.textLight} />
       </TouchableOpacity>
 
-      {/* WhatsApp Sticker Button */}
+      {/* WhatsApp Stickers */}
       <TouchableOpacity
         style={styles.whatsappButton}
         onPress={() => setShowWhatsAppModal(true)}
@@ -245,22 +257,45 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
         <Ionicons name="chevron-forward" size={24} color={colors.textLight} />
       </TouchableOpacity>
 
-      {/* Trending from Reddit Button */}
+      {/* SECTION: YOUR PROGRESS */}
+      <View style={styles.sectionHeader}>
+        <Ionicons name="trophy" size={18} color={colors.warning} />
+        <Text style={styles.sectionHeaderText}>Your Progress</Text>
+      </View>
+
+      {/* Daily Challenge */}
       <TouchableOpacity
-        style={styles.trendingButton}
-        onPress={() => navigation.navigate('Trending')}
+        style={styles.challengeButton}
+        onPress={() => setShowChallengeModal(true)}
         activeOpacity={0.8}
       >
-        <View style={styles.trendingContent}>
-          <Ionicons name="trending-up" size={24} color="#FF4500" />
-          <View style={styles.trendingTextContainer}>
-            <Text style={styles.trendingTitle}>Trending from Reddit</Text>
-            <Text style={styles.trendingSubtitle}>Get inspired by popular memes 🔥</Text>
+        <View style={styles.challengeContent}>
+          <Ionicons name="calendar" size={24} color="#FFD700" />
+          <View style={styles.challengeTextContainer}>
+            <Text style={styles.challengeTitle}>Daily Meme Challenge</Text>
+            <Text style={styles.challengeSubtitle}>New creative prompt every day! ⭐</Text>
           </View>
         </View>
         <Ionicons name="chevron-forward" size={24} color={colors.textLight} />
       </TouchableOpacity>
 
+      {/* My Stats */}
+      <TouchableOpacity
+        style={styles.statsButton}
+        onPress={() => setShowStatsModal(true)}
+        activeOpacity={0.8}
+      >
+        <View style={styles.statsContent}>
+          <Ionicons name="stats-chart" size={24} color="#2196F3" />
+          <View style={styles.statsTextContainer}>
+            <Text style={styles.statsTitle}>My Stats</Text>
+            <Text style={styles.statsSubtitle}>Track your meme creation journey 📊</Text>
+          </View>
+        </View>
+        <Ionicons name="chevron-forward" size={24} color={colors.textLight} />
+      </TouchableOpacity>
+
+      {/* Template Count */}
       <Text style={styles.sectionTitle}>
         {filteredTemplates.length} Templates
       </Text>
@@ -269,6 +304,8 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
+      <OfflineIndicator />
+
       <FlatList
         ListHeaderComponent={renderHeader}
         data={filteredTemplates}
@@ -291,6 +328,11 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
       <WhatsAppStickerModal
         visible={showWhatsAppModal}
         onClose={() => setShowWhatsAppModal(false)}
+      />
+
+      <MemeStatsModal
+        visible={showStatsModal}
+        onClose={() => setShowStatsModal(false)}
       />
     </View>
   );
@@ -533,11 +575,64 @@ const styles = StyleSheet.create({
     fontSize: 13,
     color: colors.textLight,
   },
+  sectionHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    marginTop: 8,
+    marginBottom: 12,
+    paddingTop: 8,
+    borderTopWidth: 1,
+    borderTopColor: colors.border,
+  },
+  sectionHeaderText: {
+    fontSize: 14,
+    fontWeight: '700',
+    color: colors.text,
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
+  },
+  statsButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    backgroundColor: '#E3F2FD',
+    borderRadius: 12,
+    padding: 16,
+    marginBottom: 16,
+    borderWidth: 2,
+    borderColor: '#2196F3',
+    shadowColor: '#2196F3',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  statsContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+    flex: 1,
+  },
+  statsTextContainer: {
+    flex: 1,
+  },
+  statsTitle: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: colors.text,
+    marginBottom: 4,
+  },
+  statsSubtitle: {
+    fontSize: 13,
+    color: colors.textLight,
+  },
   sectionTitle: {
     fontSize: 18,
     fontWeight: '700',
     color: colors.text,
     marginBottom: 16,
+    marginTop: 8,
   },
   listContent: {
     paddingHorizontal: 16,

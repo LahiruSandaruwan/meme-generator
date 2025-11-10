@@ -40,6 +40,7 @@ import { AdvancedTextStyle } from '../utils/advancedTextEffects';
 import { shareToAny, getSuggestedHashtags } from '../utils/socialShare';
 import { adManager } from '../utils/adManager';
 import { premiumManager } from '../utils/premiumManager';
+import { optimizeImageForExport } from '../utils/imageOptimization';
 
 const { width } = Dimensions.get('window');
 const MEME_WIDTH = width - 32;
@@ -299,13 +300,16 @@ const EditorScreen: React.FC<EditorScreenProps> = ({ navigation, route }) => {
       // Capture the meme
       const uri = await viewShotRef.current.capture();
 
+      // Optimize the image for social media sharing
+      const optimizedUri = await optimizeImageForExport(uri, 'social');
+
       // Save to gallery
-      await saveImageToGallery(uri);
+      await saveImageToGallery(optimizedUri);
 
       // Save to app storage
       const meme = {
         id: generateUniqueId(),
-        uri,
+        uri: optimizedUri,
         timestamp: Date.now(),
         templateId: route.params.templateId,
       };
