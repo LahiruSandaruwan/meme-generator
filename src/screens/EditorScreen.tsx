@@ -32,9 +32,11 @@ import { FontPicker } from '../components/FontPicker';
 import { ImageFilters, ImageFilter } from '../components/ImageFilters';
 import { ShapeSelector } from '../components/ShapeSelector';
 import { FrameSelector } from '../components/FrameSelector';
+import { AdvancedTextEffectsModal } from '../components/AdvancedTextEffectsModal';
 import { Sticker } from '../utils/stickerData';
 import { Font, getFontFamily } from '../utils/fontData';
 import { Shape, Frame } from '../utils/shapes';
+import { AdvancedTextStyle } from '../utils/advancedTextEffects';
 import { shareToAny, getSuggestedHashtags } from '../utils/socialShare';
 import { adManager } from '../utils/adManager';
 import { premiumManager } from '../utils/premiumManager';
@@ -91,6 +93,9 @@ const EditorScreen: React.FC<EditorScreenProps> = ({ navigation, route }) => {
   // Frame state
   const [frame, setFrame] = useState<Frame | null>(null);
   const [showFrameSelector, setShowFrameSelector] = useState(false);
+
+  // Advanced text effects state
+  const [showAdvancedEffects, setShowAdvancedEffects] = useState(false);
 
   const textColors = ['#FFFFFF', '#000000', '#FF0000', '#FFFF00', '#00FF00', '#0000FF'];
 
@@ -251,6 +256,25 @@ const EditorScreen: React.FC<EditorScreenProps> = ({ navigation, route }) => {
   const handleFontSelect = useCallback((font: Font) => {
     if (selectedTextId) {
       updateTextBox(selectedTextId, { fontFamily: font.family });
+    }
+  }, [selectedTextId, updateTextBox]);
+
+  // Advanced text effects management
+  const handleApplyAdvancedEffect = useCallback((style: Partial<AdvancedTextStyle>) => {
+    if (selectedTextId) {
+      const updates: Partial<MemeText> = {};
+
+      if (style.color) updates.color = style.color;
+      if (style.strokeColor) updates.strokeColor = style.strokeColor;
+      if (style.strokeWidth !== undefined) updates.strokeWidth = style.strokeWidth;
+      if (style.fontSize) updates.fontSize = style.fontSize;
+
+      // Apply the effect type if available
+      if (style.effect) {
+        updates.effect = style.effect === 'none' ? 'none' : 'shadow'; // Map to existing effects
+      }
+
+      updateTextBox(selectedTextId, updates);
     }
   }, [selectedTextId, updateTextBox]);
 
@@ -686,6 +710,16 @@ const EditorScreen: React.FC<EditorScreenProps> = ({ navigation, route }) => {
                 ))}
               </View>
 
+              {/* Advanced Effects Button */}
+              <TouchableOpacity
+                style={styles.advancedEffectsButton}
+                onPress={() => setShowAdvancedEffects(true)}
+              >
+                <Ionicons name="sparkles" size={20} color={colors.primary} />
+                <Text style={styles.advancedEffectsButtonText}>Advanced Text Effects</Text>
+                <Ionicons name="chevron-forward" size={20} color={colors.textLight} />
+              </TouchableOpacity>
+
               {/* Delete Button */}
               <TouchableOpacity
                 onPress={() => deleteTextBox(selectedText.id)}
@@ -906,6 +940,14 @@ const EditorScreen: React.FC<EditorScreenProps> = ({ navigation, route }) => {
         onClose={() => setShowFrameSelector(false)}
         onSelectFrame={handleSelectFrame}
         currentFrame={frame}
+      />
+
+      {/* Advanced Text Effects Modal */}
+      <AdvancedTextEffectsModal
+        visible={showAdvancedEffects}
+        onClose={() => setShowAdvancedEffects(false)}
+        onApplyEffect={handleApplyAdvancedEffect}
+        currentEffect={selectedText?.effect || 'none'}
       />
 
       {/* Ad Banner */}
@@ -1350,6 +1392,25 @@ const styles = StyleSheet.create({
   },
   effectOptionLabelSelected: {
     color: colors.primary,
+  },
+  advancedEffectsButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    backgroundColor: colors.background,
+    borderRadius: 12,
+    padding: 14,
+    marginTop: 12,
+    marginBottom: 16,
+    borderWidth: 2,
+    borderColor: colors.primary,
+  },
+  advancedEffectsButtonText: {
+    flex: 1,
+    fontSize: 14,
+    fontWeight: '600',
+    color: colors.primary,
+    marginLeft: 8,
   },
   rotationButtons: {
     flexDirection: 'row',
