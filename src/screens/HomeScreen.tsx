@@ -225,6 +225,22 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
         <Ionicons name="chevron-forward" size={24} color={colors.textLight} />
       </TouchableOpacity>
 
+      {/* Collage Maker */}
+      <TouchableOpacity
+        style={styles.collageButton}
+        onPress={() => navigation.navigate('CollageEditor')}
+        activeOpacity={0.8}
+      >
+        <View style={styles.collageContent}>
+          <Ionicons name="albums" size={24} color="#FF6F00" />
+          <View style={styles.collageTextContainer}>
+            <Text style={styles.collageTitle}>Collage Maker</Text>
+            <Text style={styles.collageSubtitle}>Combine multiple memes in one! 🖼️</Text>
+          </View>
+        </View>
+        <Ionicons name="chevron-forward" size={24} color={colors.textLight} />
+      </TouchableOpacity>
+
       {/* Instagram Story */}
       <TouchableOpacity
         style={styles.storyButton}
@@ -467,6 +483,41 @@ const styles = StyleSheet.create({
     marginBottom: 4,
   },
   multiPanelSubtitle: {
+    fontSize: 13,
+    color: colors.textLight,
+  },
+  collageButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    backgroundColor: '#FFF3E0',
+    borderRadius: 12,
+    padding: 16,
+    marginBottom: 16,
+    borderWidth: 2,
+    borderColor: '#FF6F00',
+    shadowColor: '#FF6F00',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  collageContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+    flex: 1,
+  },
+  collageTextContainer: {
+    flex: 1,
+  },
+  collageTitle: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: colors.text,
+    marginBottom: 4,
+  },
+  collageSubtitle: {
     fontSize: 13,
     color: colors.textLight,
   },

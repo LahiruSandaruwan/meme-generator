@@ -66,6 +66,7 @@ export type RootStackParamList = {
     templateId?: string;
     backgroundImage?: string;
   };
+  CollageEditor: undefined;
   PrivacyPolicy: undefined;
   Premium: undefined;
   Trending: undefined;

@@ -12,6 +12,7 @@ import HomeScreen from '../screens/HomeScreen';
 import EditorScreen from '../screens/EditorScreen';
 import MultiPanelEditorScreen from '../screens/MultiPanelEditorScreen';
 import StoryEditorScreen from '../screens/StoryEditorScreen';
+import CollageEditorScreen from '../screens/CollageEditorScreen';
 import GalleryScreen from '../screens/GalleryScreen';
 import SettingsScreen from '../screens/SettingsScreen';
 import PrivacyPolicyScreen from '../screens/PrivacyPolicyScreen';
@@ -131,6 +132,14 @@ export default function AppNavigator() {
         <Stack.Screen
           name="StoryEditor"
           component={StoryEditorScreen}
+          options={{
+            headerShown: false,
+            presentation: 'modal',
+          }}
+        />
+        <Stack.Screen
+          name="CollageEditor"
+          component={CollageEditorScreen}
           options={{
             headerShown: false,
             presentation: 'modal',
