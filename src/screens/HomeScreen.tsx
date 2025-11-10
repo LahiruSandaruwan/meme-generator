@@ -18,6 +18,7 @@ import { MainTabParamList, RootStackParamList, MemeTemplate as MemeTemplateType 
 import { memeTemplates, searchTemplates, getCategories } from '../utils/memeTemplates';
 import { MemeTemplate } from '../components/MemeTemplate';
 import { CustomButton } from '../components/CustomButton';
+import { DailyChallengeModal } from '../components/DailyChallengeModal';
 
 type HomeScreenNavigationProp = CompositeNavigationProp<
   BottomTabNavigationProp<MainTabParamList, 'Home'>,
@@ -31,6 +32,7 @@ type HomeScreenProps = {
 const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('All');
+  const [showChallengeModal, setShowChallengeModal] = useState(false);
 
   const categories = getCategories();
   const filteredTemplates = searchQuery
@@ -106,6 +108,16 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
     }
   };
 
+  const handleStartChallenge = () => {
+    // Navigate to editor with blank canvas for challenge
+    // User can use any template or upload photo
+    Alert.alert(
+      'Ready to Create!',
+      'Choose a template, upload a photo, or take a picture to start your challenge meme!',
+      [{ text: 'Got it!' }]
+    );
+  };
+
   const renderHeader = () => (
     <View style={styles.header}>
       <View style={styles.searchContainer}>
@@ -167,6 +179,22 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
         />
       </View>
 
+      {/* Daily Challenge Button */}
+      <TouchableOpacity
+        style={styles.challengeButton}
+        onPress={() => setShowChallengeModal(true)}
+        activeOpacity={0.8}
+      >
+        <View style={styles.challengeContent}>
+          <Ionicons name="calendar" size={24} color="#FFD700" />
+          <View style={styles.challengeTextContainer}>
+            <Text style={styles.challengeTitle}>Daily Meme Challenge</Text>
+            <Text style={styles.challengeSubtitle}>New creative prompt every day! ⭐</Text>
+          </View>
+        </View>
+        <Ionicons name="chevron-forward" size={24} color={colors.textLight} />
+      </TouchableOpacity>
+
       {/* Trending from Reddit Button */}
       <TouchableOpacity
         style={styles.trendingButton}
@@ -202,6 +230,12 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
         columnWrapperStyle={styles.row}
         contentContainerStyle={styles.listContent}
         showsVerticalScrollIndicator={false}
+      />
+
+      <DailyChallengeModal
+        visible={showChallengeModal}
+        onClose={() => setShowChallengeModal(false)}
+        onStartChallenge={handleStartChallenge}
       />
     </View>
   );
@@ -268,6 +302,41 @@ const styles = StyleSheet.create({
   },
   uploadButton: {
     flex: 1,
+  },
+  challengeButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    backgroundColor: '#FFF9E6',
+    borderRadius: 12,
+    padding: 16,
+    marginBottom: 16,
+    borderWidth: 2,
+    borderColor: '#FFD700',
+    shadowColor: '#FFD700',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  challengeContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+    flex: 1,
+  },
+  challengeTextContainer: {
+    flex: 1,
+  },
+  challengeTitle: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: colors.text,
+    marginBottom: 4,
+  },
+  challengeSubtitle: {
+    fontSize: 13,
+    color: colors.textLight,
   },
   trendingButton: {
     flexDirection: 'row',
