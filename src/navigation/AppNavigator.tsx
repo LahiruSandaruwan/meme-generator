@@ -11,6 +11,7 @@ import OnboardingScreen from '../screens/OnboardingScreen';
 import HomeScreen from '../screens/HomeScreen';
 import EditorScreen from '../screens/EditorScreen';
 import MultiPanelEditorScreen from '../screens/MultiPanelEditorScreen';
+import StoryEditorScreen from '../screens/StoryEditorScreen';
 import GalleryScreen from '../screens/GalleryScreen';
 import SettingsScreen from '../screens/SettingsScreen';
 import PrivacyPolicyScreen from '../screens/PrivacyPolicyScreen';
@@ -122,6 +123,14 @@ export default function AppNavigator() {
         <Stack.Screen
           name="MultiPanelEditor"
           component={MultiPanelEditorScreen}
+          options={{
+            headerShown: false,
+            presentation: 'modal',
+          }}
+        />
+        <Stack.Screen
+          name="StoryEditor"
+          component={StoryEditorScreen}
           options={{
             headerShown: false,
             presentation: 'modal',

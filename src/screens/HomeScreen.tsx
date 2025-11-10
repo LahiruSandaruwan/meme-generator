@@ -211,6 +211,22 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
         <Ionicons name="chevron-forward" size={24} color={colors.textLight} />
       </TouchableOpacity>
 
+      {/* Instagram Story Button */}
+      <TouchableOpacity
+        style={styles.storyButton}
+        onPress={() => navigation.navigate('StoryEditor', {})}
+        activeOpacity={0.8}
+      >
+        <View style={styles.storyContent}>
+          <Ionicons name="logo-instagram" size={24} color="#E1306C" />
+          <View style={styles.storyTextContainer}>
+            <Text style={styles.storyTitle}>Instagram Stories</Text>
+            <Text style={styles.storySubtitle}>Perfect 9:16 format! 📱</Text>
+          </View>
+        </View>
+        <Ionicons name="chevron-forward" size={24} color={colors.textLight} />
+      </TouchableOpacity>
+
       {/* Trending from Reddit Button */}
       <TouchableOpacity
         style={styles.trendingButton}
@@ -386,6 +402,41 @@ const styles = StyleSheet.create({
     marginBottom: 4,
   },
   multiPanelSubtitle: {
+    fontSize: 13,
+    color: colors.textLight,
+  },
+  storyButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    backgroundColor: '#FCE4EC',
+    borderRadius: 12,
+    padding: 16,
+    marginBottom: 16,
+    borderWidth: 2,
+    borderColor: '#E1306C',
+    shadowColor: '#E1306C',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  storyContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+    flex: 1,
+  },
+  storyTextContainer: {
+    flex: 1,
+  },
+  storyTitle: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: colors.text,
+    marginBottom: 4,
+  },
+  storySubtitle: {
     fontSize: 13,
     color: colors.textLight,
   },

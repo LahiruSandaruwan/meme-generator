@@ -62,6 +62,10 @@ export type RootStackParamList = {
     templateName?: string;
   };
   MultiPanelEditor: undefined;
+  StoryEditor: {
+    templateId?: string;
+    backgroundImage?: string;
+  };
   PrivacyPolicy: undefined;
   Premium: undefined;
   Trending: undefined;
