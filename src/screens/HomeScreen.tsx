@@ -19,6 +19,7 @@ import { memeTemplates, searchTemplates, getCategories } from '../utils/memeTemp
 import { MemeTemplate } from '../components/MemeTemplate';
 import { CustomButton } from '../components/CustomButton';
 import { DailyChallengeModal } from '../components/DailyChallengeModal';
+import { WhatsAppStickerModal } from '../components/WhatsAppStickerModal';
 
 type HomeScreenNavigationProp = CompositeNavigationProp<
   BottomTabNavigationProp<MainTabParamList, 'Home'>,
@@ -33,6 +34,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [showChallengeModal, setShowChallengeModal] = useState(false);
+  const [showWhatsAppModal, setShowWhatsAppModal] = useState(false);
 
   const categories = getCategories();
   const filteredTemplates = searchQuery
@@ -227,6 +229,22 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
         <Ionicons name="chevron-forward" size={24} color={colors.textLight} />
       </TouchableOpacity>
 
+      {/* WhatsApp Sticker Button */}
+      <TouchableOpacity
+        style={styles.whatsappButton}
+        onPress={() => setShowWhatsAppModal(true)}
+        activeOpacity={0.8}
+      >
+        <View style={styles.whatsappContent}>
+          <Ionicons name="logo-whatsapp" size={24} color="#25D366" />
+          <View style={styles.whatsappTextContainer}>
+            <Text style={styles.whatsappTitle}>WhatsApp Stickers</Text>
+            <Text style={styles.whatsappSubtitle}>Convert to viral sticker packs! 💬</Text>
+          </View>
+        </View>
+        <Ionicons name="chevron-forward" size={24} color={colors.textLight} />
+      </TouchableOpacity>
+
       {/* Trending from Reddit Button */}
       <TouchableOpacity
         style={styles.trendingButton}
@@ -268,6 +286,11 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
         visible={showChallengeModal}
         onClose={() => setShowChallengeModal(false)}
         onStartChallenge={handleStartChallenge}
+      />
+
+      <WhatsAppStickerModal
+        visible={showWhatsAppModal}
+        onClose={() => setShowWhatsAppModal(false)}
       />
     </View>
   );
@@ -437,6 +460,41 @@ const styles = StyleSheet.create({
     marginBottom: 4,
   },
   storySubtitle: {
+    fontSize: 13,
+    color: colors.textLight,
+  },
+  whatsappButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    backgroundColor: '#E8F5E9',
+    borderRadius: 12,
+    padding: 16,
+    marginBottom: 16,
+    borderWidth: 2,
+    borderColor: '#25D366',
+    shadowColor: '#25D366',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  whatsappContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+    flex: 1,
+  },
+  whatsappTextContainer: {
+    flex: 1,
+  },
+  whatsappTitle: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: colors.text,
+    marginBottom: 4,
+  },
+  whatsappSubtitle: {
     fontSize: 13,
     color: colors.textLight,
   },
