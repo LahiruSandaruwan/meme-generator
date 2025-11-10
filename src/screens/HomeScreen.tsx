@@ -195,6 +195,22 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
         <Ionicons name="chevron-forward" size={24} color={colors.textLight} />
       </TouchableOpacity>
 
+      {/* Multi-Panel Creator Button */}
+      <TouchableOpacity
+        style={styles.multiPanelButton}
+        onPress={() => navigation.navigate('MultiPanelEditor')}
+        activeOpacity={0.8}
+      >
+        <View style={styles.multiPanelContent}>
+          <Ionicons name="grid" size={24} color="#9C27B0" />
+          <View style={styles.multiPanelTextContainer}>
+            <Text style={styles.multiPanelTitle}>Multi-Panel Memes</Text>
+            <Text style={styles.multiPanelSubtitle}>Create 2x2, 3x1 grids & more! ✨</Text>
+          </View>
+        </View>
+        <Ionicons name="chevron-forward" size={24} color={colors.textLight} />
+      </TouchableOpacity>
+
       {/* Trending from Reddit Button */}
       <TouchableOpacity
         style={styles.trendingButton}
@@ -335,6 +351,41 @@ const styles = StyleSheet.create({
     marginBottom: 4,
   },
   challengeSubtitle: {
+    fontSize: 13,
+    color: colors.textLight,
+  },
+  multiPanelButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    backgroundColor: '#F3E5F5',
+    borderRadius: 12,
+    padding: 16,
+    marginBottom: 16,
+    borderWidth: 2,
+    borderColor: '#9C27B0',
+    shadowColor: '#9C27B0',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  multiPanelContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+    flex: 1,
+  },
+  multiPanelTextContainer: {
+    flex: 1,
+  },
+  multiPanelTitle: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: colors.text,
+    marginBottom: 4,
+  },
+  multiPanelSubtitle: {
     fontSize: 13,
     color: colors.textLight,
   },

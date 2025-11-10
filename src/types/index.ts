@@ -61,6 +61,7 @@ export type RootStackParamList = {
     templateId?: string;
     templateName?: string;
   };
+  MultiPanelEditor: undefined;
   PrivacyPolicy: undefined;
   Premium: undefined;
   Trending: undefined;

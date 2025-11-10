@@ -10,6 +10,7 @@ import { RootStackParamList, MainTabParamList } from '../types';
 import OnboardingScreen from '../screens/OnboardingScreen';
 import HomeScreen from '../screens/HomeScreen';
 import EditorScreen from '../screens/EditorScreen';
+import MultiPanelEditorScreen from '../screens/MultiPanelEditorScreen';
 import GalleryScreen from '../screens/GalleryScreen';
 import SettingsScreen from '../screens/SettingsScreen';
 import PrivacyPolicyScreen from '../screens/PrivacyPolicyScreen';
@@ -115,6 +116,14 @@ export default function AppNavigator() {
           component={EditorScreen}
           options={{
             title: 'Create Meme',
+            presentation: 'modal',
+          }}
+        />
+        <Stack.Screen
+          name="MultiPanelEditor"
+          component={MultiPanelEditorScreen}
+          options={{
+            headerShown: false,
             presentation: 'modal',
           }}
         />
