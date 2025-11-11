@@ -33,10 +33,13 @@ import { ImageFilters, ImageFilter } from '../components/ImageFilters';
 import { ShapeSelector } from '../components/ShapeSelector';
 import { FrameSelector } from '../components/FrameSelector';
 import { AdvancedTextEffectsModal } from '../components/AdvancedTextEffectsModal';
+import { DrawingCanvasWithRef, DrawingCanvasRef } from '../components/DrawingCanvas';
+import { DrawingToolsModal } from '../components/DrawingToolsModal';
 import { Sticker } from '../utils/stickerData';
 import { Font, getFontFamily } from '../utils/fontData';
 import { Shape, Frame } from '../utils/shapes';
 import { AdvancedTextStyle } from '../utils/advancedTextEffects';
+import { DrawingPath, DrawingSettings, DEFAULT_DRAWING_SETTINGS } from '../utils/drawing';
 import { shareToAny, getSuggestedHashtags } from '../utils/socialShare';
 import { adManager } from '../utils/adManager';
 import { premiumManager } from '../utils/premiumManager';
@@ -97,6 +100,13 @@ const EditorScreen: React.FC<EditorScreenProps> = ({ navigation, route }) => {
 
   // Advanced text effects state
   const [showAdvancedEffects, setShowAdvancedEffects] = useState(false);
+
+  // Drawing tools state
+  const [drawingEnabled, setDrawingEnabled] = useState(false);
+  const [drawingSettings, setDrawingSettings] = useState<DrawingSettings>(DEFAULT_DRAWING_SETTINGS);
+  const [drawingPaths, setDrawingPaths] = useState<DrawingPath[]>([]);
+  const [showDrawingTools, setShowDrawingTools] = useState(false);
+  const drawingCanvasRef = useRef<DrawingCanvasRef>(null);
 
   const textColors = ['#FFFFFF', '#000000', '#FF0000', '#FFFF00', '#00FF00', '#0000FF'];
 
@@ -518,6 +528,16 @@ const EditorScreen: React.FC<EditorScreenProps> = ({ navigation, route }) => {
                 ) : null;
               })}
 
+              {/* Drawing Canvas Overlay */}
+              <DrawingCanvasWithRef
+                ref={drawingCanvasRef}
+                width={MEME_WIDTH}
+                height={MEME_WIDTH}
+                settings={drawingSettings}
+                enabled={drawingEnabled}
+                onPathsChange={setDrawingPaths}
+              />
+
               {/* Watermark */}
               {showWatermark && (
                 <Text style={styles.watermark}>{APP_CONFIG.watermarkText}</Text>
@@ -585,6 +605,19 @@ const EditorScreen: React.FC<EditorScreenProps> = ({ navigation, route }) => {
               >
                 <Ionicons name="image-outline" size={20} color={colors.white} />
                 <Text style={styles.addFrameButtonText}>Frame</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                onPress={() => {
+                  setDrawingEnabled(!drawingEnabled);
+                  setShowDrawingTools(true);
+                }}
+                style={[
+                  styles.addDrawingButton,
+                  drawingEnabled && styles.drawingButtonActive,
+                ]}
+              >
+                <Ionicons name="brush" size={20} color={colors.white} />
+                <Text style={styles.addDrawingButtonText}>Draw</Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -954,6 +987,19 @@ const EditorScreen: React.FC<EditorScreenProps> = ({ navigation, route }) => {
         currentEffect={selectedText?.effect || 'none'}
       />
 
+      {/* Drawing Tools Modal */}
+      <DrawingToolsModal
+        visible={showDrawingTools}
+        onClose={() => setShowDrawingTools(false)}
+        settings={drawingSettings}
+        onSettingsChange={setDrawingSettings}
+        onUndo={() => drawingCanvasRef.current?.undo()}
+        onRedo={() => drawingCanvasRef.current?.redo()}
+        onClear={() => drawingCanvasRef.current?.clear()}
+        canUndo={drawingCanvasRef.current?.canUndo() || false}
+        canRedo={drawingCanvasRef.current?.canRedo() || false}
+      />
+
       {/* Ad Banner */}
       <AdBanner />
     </GestureHandlerRootView>
@@ -1269,6 +1315,26 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   addFrameButtonText: {
+    color: colors.white,
+    fontSize: 14,
+    fontWeight: '600',
+  },
+  addDrawingButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#E91E63',
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+    borderRadius: 8,
+    gap: 6,
+    flex: 1,
+  },
+  drawingButtonActive: {
+    backgroundColor: '#C2185B',
+    borderWidth: 2,
+    borderColor: colors.white,
+  },
+  addDrawingButtonText: {
     color: colors.white,
     fontSize: 14,
     fontWeight: '600',
