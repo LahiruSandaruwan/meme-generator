@@ -548,76 +548,115 @@ const EditorScreen: React.FC<EditorScreenProps> = ({ navigation, route }) => {
 
         {/* Controls */}
         <View style={styles.controlsContainer}>
-          {/* Undo/Redo, Filters, and Add Buttons */}
-          <View style={styles.topControls}>
-            <View style={styles.undoRedoContainer}>
+          {/* Top Toolbar: Undo/Redo & Filters */}
+          <View style={styles.toolbarRow}>
+            <View style={styles.undoRedoGroup}>
               <TouchableOpacity
                 onPress={undo}
                 disabled={history.past.length === 0}
-                style={[styles.iconButton, history.past.length === 0 && styles.iconButtonDisabled]}
+                style={[styles.toolButton, history.past.length === 0 && styles.toolButtonDisabled]}
               >
-                <Ionicons name="arrow-undo" size={24} color={history.past.length === 0 ? colors.textLight : colors.primary} />
+                <Ionicons
+                  name="arrow-undo"
+                  size={22}
+                  color={history.past.length === 0 ? colors.textLight : colors.text}
+                />
               </TouchableOpacity>
+              <View style={styles.toolDivider} />
               <TouchableOpacity
                 onPress={redo}
                 disabled={history.future.length === 0}
-                style={[styles.iconButton, history.future.length === 0 && styles.iconButtonDisabled]}
-              >
-                <Ionicons name="arrow-redo" size={24} color={history.future.length === 0 ? colors.textLight : colors.primary} />
-              </TouchableOpacity>
-              <TouchableOpacity
-                onPress={() => setShowImageFilters(true)}
-                style={[
-                  styles.iconButton,
-                  (imageFilters.brightness !== 0 || imageFilters.contrast !== 0 || imageFilters.saturation !== 1) && styles.filterButtonActive
-                ]}
+                style={[styles.toolButton, history.future.length === 0 && styles.toolButtonDisabled]}
               >
                 <Ionicons
-                  name="color-filter"
-                  size={24}
-                  color={(imageFilters.brightness !== 0 || imageFilters.contrast !== 0 || imageFilters.saturation !== 1) ? colors.success : colors.primary}
+                  name="arrow-redo"
+                  size={22}
+                  color={history.future.length === 0 ? colors.textLight : colors.text}
                 />
               </TouchableOpacity>
             </View>
 
-            <View style={styles.addButtonsContainer}>
-              <TouchableOpacity onPress={addTextBox} style={styles.addTextButton}>
-                <Ionicons name="add-circle" size={20} color={colors.white} />
-                <Text style={styles.addTextButtonText}>Text</Text>
+            <TouchableOpacity
+              onPress={() => setShowImageFilters(true)}
+              style={[
+                styles.filterButton,
+                (imageFilters.brightness !== 0 || imageFilters.contrast !== 0 || imageFilters.saturation !== 1) && styles.filterButtonActive
+              ]}
+            >
+              <Ionicons
+                name="color-filter"
+                size={22}
+                color={(imageFilters.brightness !== 0 || imageFilters.contrast !== 0 || imageFilters.saturation !== 1) ? colors.success : colors.text}
+              />
+              <Text style={styles.filterButtonText}>Filters</Text>
+            </TouchableOpacity>
+          </View>
+
+          {/* Primary Actions */}
+          <View style={styles.primaryActionsSection}>
+            <Text style={styles.sectionLabel}>ADD TO MEME</Text>
+            <View style={styles.primaryActionsRow}>
+              <TouchableOpacity
+                onPress={addTextBox}
+                style={styles.primaryActionButton}
+                activeOpacity={0.7}
+              >
+                <View style={[styles.actionIconContainer, { backgroundColor: '#007AFF' }]}>
+                  <Ionicons name="text" size={24} color={colors.white} />
+                </View>
+                <Text style={styles.actionButtonText}>Text</Text>
               </TouchableOpacity>
+
               <TouchableOpacity
                 onPress={() => setShowStickerPicker(true)}
-                style={styles.addStickerButton}
+                style={styles.primaryActionButton}
+                activeOpacity={0.7}
               >
-                <Ionicons name="happy-outline" size={20} color={colors.white} />
-                <Text style={styles.addStickerButtonText}>Sticker</Text>
+                <View style={[styles.actionIconContainer, { backgroundColor: '#FF9500' }]}>
+                  <Ionicons name="happy" size={24} color={colors.white} />
+                </View>
+                <Text style={styles.actionButtonText}>Sticker</Text>
               </TouchableOpacity>
-              <TouchableOpacity
-                onPress={() => setShowShapeSelector(true)}
-                style={styles.addShapeButton}
-              >
-                <Ionicons name="shapes" size={20} color={colors.white} />
-                <Text style={styles.addShapeButtonText}>Shape</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                onPress={() => setShowFrameSelector(true)}
-                style={styles.addFrameButton}
-              >
-                <Ionicons name="image-outline" size={20} color={colors.white} />
-                <Text style={styles.addFrameButtonText}>Frame</Text>
-              </TouchableOpacity>
+
               <TouchableOpacity
                 onPress={() => {
                   setDrawingEnabled(!drawingEnabled);
                   setShowDrawingTools(true);
                 }}
-                style={[
-                  styles.addDrawingButton,
-                  drawingEnabled && styles.drawingButtonActive,
-                ]}
+                style={styles.primaryActionButton}
+                activeOpacity={0.7}
               >
-                <Ionicons name="brush" size={20} color={colors.white} />
-                <Text style={styles.addDrawingButtonText}>Draw</Text>
+                <View style={[
+                  styles.actionIconContainer,
+                  { backgroundColor: drawingEnabled ? '#34C759' : '#FF2D55' }
+                ]}>
+                  <Ionicons name="brush" size={24} color={colors.white} />
+                </View>
+                <Text style={styles.actionButtonText}>Draw</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+
+          {/* Secondary Creative Tools */}
+          <View style={styles.secondaryActionsSection}>
+            <Text style={styles.sectionLabel}>MORE TOOLS</Text>
+            <View style={styles.secondaryActionsRow}>
+              <TouchableOpacity
+                onPress={() => setShowShapeSelector(true)}
+                style={styles.secondaryActionButton}
+                activeOpacity={0.7}
+              >
+                <Ionicons name="shapes" size={20} color={colors.primary} />
+                <Text style={styles.secondaryActionText}>Shapes</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                onPress={() => setShowFrameSelector(true)}
+                style={styles.secondaryActionButton}
+                activeOpacity={0.7}
+              >
+                <Ionicons name="image-outline" size={20} color={colors.primary} />
+                <Text style={styles.secondaryActionText}>Frame</Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -1228,116 +1267,139 @@ const styles = StyleSheet.create({
   controlsContainer: {
     paddingHorizontal: 16,
   },
-  topControls: {
+  // Toolbar styles
+  toolbarRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 16,
+    marginBottom: 20,
   },
-  undoRedoContainer: {
+  undoRedoGroup: {
     flexDirection: 'row',
-    gap: 8,
-  },
-  iconButton: {
-    padding: 8,
+    alignItems: 'center',
     backgroundColor: colors.white,
-    borderRadius: 8,
+    borderRadius: 12,
+    padding: 4,
     shadowColor: colors.shadow,
-    shadowOffset: { width: 0, height: 2 },
+    shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.1,
-    shadowRadius: 4,
+    shadowRadius: 2,
     elevation: 2,
   },
-  iconButtonDisabled: {
-    opacity: 0.5,
+  toolButton: {
+    padding: 10,
+    borderRadius: 8,
+  },
+  toolButtonDisabled: {
+    opacity: 0.4,
+  },
+  toolDivider: {
+    width: 1,
+    height: 20,
+    backgroundColor: colors.border,
+    marginHorizontal: 4,
+  },
+  filterButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: colors.white,
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+    borderRadius: 12,
+    gap: 6,
+    shadowColor: colors.shadow,
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 2,
+    elevation: 2,
   },
   filterButtonActive: {
     backgroundColor: `${colors.success}20`,
   },
-  addButtonsContainer: {
+  filterButtonText: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: colors.text,
+  },
+
+  // Section labels
+  sectionLabel: {
+    fontSize: 11,
+    fontWeight: '700',
+    color: colors.textLight,
+    letterSpacing: 0.5,
+    marginBottom: 12,
+    textTransform: 'uppercase',
+  },
+
+  // Primary actions (Text, Sticker, Draw)
+  primaryActionsSection: {
+    marginBottom: 24,
+  },
+  primaryActionsRow: {
     flexDirection: 'row',
-    flexWrap: 'wrap',
+    justifyContent: 'space-around',
+    gap: 12,
+  },
+  primaryActionButton: {
+    alignItems: 'center',
+    flex: 1,
     gap: 8,
   },
-  addTextButton: {
-    flexDirection: 'row',
+  actionIconContainer: {
+    width: 56,
+    height: 56,
+    borderRadius: 28,
     alignItems: 'center',
-    backgroundColor: colors.primary,
-    paddingHorizontal: 12,
-    paddingVertical: 10,
-    borderRadius: 8,
-    gap: 6,
-    flex: 1,
+    justifyContent: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.15,
+    shadowRadius: 4,
+    elevation: 3,
   },
-  addTextButtonText: {
-    color: colors.white,
-    fontSize: 14,
+  actionButtonText: {
+    fontSize: 13,
     fontWeight: '600',
-  },
-  addStickerButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#FF6B6B',
-    paddingHorizontal: 12,
-    paddingVertical: 10,
-    borderRadius: 8,
-    gap: 6,
-    flex: 1,
-  },
-  addStickerButtonText: {
-    color: colors.white,
-    fontSize: 14,
-    fontWeight: '600',
-  },
-  addShapeButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#9C27B0',
-    paddingHorizontal: 12,
-    paddingVertical: 10,
-    borderRadius: 8,
-    gap: 6,
-    flex: 1,
-  },
-  addShapeButtonText: {
-    color: colors.white,
-    fontSize: 14,
-    fontWeight: '600',
-  },
-  addFrameButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#FF9800',
-    paddingHorizontal: 12,
-    paddingVertical: 10,
-    borderRadius: 8,
-    gap: 6,
-    flex: 1,
-  },
-  addFrameButtonText: {
-    color: colors.white,
-    fontSize: 14,
-    fontWeight: '600',
-  },
-  addDrawingButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#E91E63',
-    paddingHorizontal: 12,
-    paddingVertical: 10,
-    borderRadius: 8,
-    gap: 6,
-    flex: 1,
+    color: colors.text,
   },
   drawingButtonActive: {
-    backgroundColor: '#C2185B',
-    borderWidth: 2,
-    borderColor: colors.white,
+    transform: [{ scale: 1.05 }],
+    shadowOpacity: 0.25,
+    shadowRadius: 6,
+    elevation: 5,
   },
-  addDrawingButtonText: {
-    color: colors.white,
+
+  // Secondary actions (Shapes, Frame)
+  secondaryActionsSection: {
+    marginBottom: 16,
+  },
+  secondaryActionsRow: {
+    flexDirection: 'row',
+    gap: 12,
+  },
+  secondaryActionButton: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: colors.white,
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    borderRadius: 12,
+    borderWidth: 1.5,
+    borderColor: colors.border,
+    gap: 8,
+    shadowColor: colors.shadow,
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.05,
+    shadowRadius: 2,
+    elevation: 1,
+  },
+  secondaryActionText: {
     fontSize: 14,
     fontWeight: '600',
+    color: colors.text,
   },
   selectedTextControls: {
     backgroundColor: colors.white,
