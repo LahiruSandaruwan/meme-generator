@@ -273,6 +273,22 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
         <Ionicons name="chevron-forward" size={24} color={colors.textLight} />
       </TouchableOpacity>
 
+      {/* GIF Editor */}
+      <TouchableOpacity
+        style={styles.gifButton}
+        onPress={() => navigation.navigate('GifEditor')}
+        activeOpacity={0.8}
+      >
+        <View style={styles.gifContent}>
+          <Ionicons name="film" size={24} color="#FF5722" />
+          <View style={styles.gifTextContainer}>
+            <Text style={styles.gifTitle}>GIF Support</Text>
+            <Text style={styles.gifSubtitle}>Import & edit animated GIFs! 🎬</Text>
+          </View>
+        </View>
+        <Ionicons name="chevron-forward" size={24} color={colors.textLight} />
+      </TouchableOpacity>
+
       {/* SECTION: YOUR PROGRESS */}
       <View style={styles.sectionHeader}>
         <Ionicons name="trophy" size={18} color={colors.warning} />
@@ -588,6 +604,41 @@ const styles = StyleSheet.create({
     marginBottom: 4,
   },
   whatsappSubtitle: {
+    fontSize: 13,
+    color: colors.textLight,
+  },
+  gifButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    backgroundColor: '#FFEBEE',
+    borderRadius: 12,
+    padding: 16,
+    marginBottom: 16,
+    borderWidth: 2,
+    borderColor: '#FF5722',
+    shadowColor: '#FF5722',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  gifContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+    flex: 1,
+  },
+  gifTextContainer: {
+    flex: 1,
+  },
+  gifTitle: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: colors.text,
+    marginBottom: 4,
+  },
+  gifSubtitle: {
     fontSize: 13,
     color: colors.textLight,
   },

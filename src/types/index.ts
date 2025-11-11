@@ -67,6 +67,7 @@ export type RootStackParamList = {
     backgroundImage?: string;
   };
   CollageEditor: undefined;
+  GifEditor: undefined;
   PrivacyPolicy: undefined;
   Premium: undefined;
   Trending: undefined;
