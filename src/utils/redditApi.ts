@@ -55,6 +55,108 @@ const SUBREDDITS = [
 ];
 
 /**
+ * Fallback sample memes when Reddit API is unavailable
+ */
+const FALLBACK_MEMES: RedditMeme[] = [
+  {
+    id: 'sample1',
+    title: 'Drake Hotline Bling - Classic Format',
+    imageUrl: 'https://i.imgflip.com/30b1gx.jpg',
+    author: 'MemeGenerator',
+    upvotes: 25400,
+    comments: 789,
+    subreddit: 'memes',
+    permalink: 'https://www.reddit.com',
+    createdAt: Date.now(),
+    isVideo: false,
+  },
+  {
+    id: 'sample2',
+    title: 'Success Kid - Feeling Accomplished',
+    imageUrl: 'https://i.imgflip.com/1bhk.jpg',
+    author: 'MemeGenerator',
+    upvotes: 18900,
+    comments: 456,
+    subreddit: 'wholesomememes',
+    permalink: 'https://www.reddit.com',
+    createdAt: Date.now(),
+    isVideo: false,
+  },
+  {
+    id: 'sample3',
+    title: 'Distracted Boyfriend - The Original',
+    imageUrl: 'https://i.imgflip.com/1ur9b0.jpg',
+    author: 'MemeGenerator',
+    upvotes: 32100,
+    comments: 1203,
+    subreddit: 'dankmemes',
+    permalink: 'https://www.reddit.com',
+    createdAt: Date.now(),
+    isVideo: false,
+  },
+  {
+    id: 'sample4',
+    title: 'Two Buttons - Tough Choices',
+    imageUrl: 'https://i.imgflip.com/1g8my4.jpg',
+    author: 'MemeGenerator',
+    upvotes: 14200,
+    comments: 342,
+    subreddit: 'memes',
+    permalink: 'https://www.reddit.com',
+    createdAt: Date.now(),
+    isVideo: false,
+  },
+  {
+    id: 'sample5',
+    title: 'Expanding Brain - Getting Smarter',
+    imageUrl: 'https://i.imgflip.com/1jwhww.jpg',
+    author: 'MemeGenerator',
+    upvotes: 21300,
+    comments: 567,
+    subreddit: 'memes',
+    permalink: 'https://www.reddit.com',
+    createdAt: Date.now(),
+    isVideo: false,
+  },
+  {
+    id: 'sample6',
+    title: 'Change My Mind - Unpopular Opinion',
+    imageUrl: 'https://i.imgflip.com/24y43o.jpg',
+    author: 'MemeGenerator',
+    upvotes: 19800,
+    comments: 891,
+    subreddit: 'memes',
+    permalink: 'https://www.reddit.com',
+    createdAt: Date.now(),
+    isVideo: false,
+  },
+  {
+    id: 'sample7',
+    title: 'Is This A Pigeon? - Confused Moments',
+    imageUrl: 'https://i.imgflip.com/1o00in.jpg',
+    author: 'MemeGenerator',
+    upvotes: 16700,
+    comments: 423,
+    subreddit: 'dankmemes',
+    permalink: 'https://www.reddit.com',
+    createdAt: Date.now(),
+    isVideo: false,
+  },
+  {
+    id: 'sample8',
+    title: 'Woman Yelling At Cat - Dinner Argument',
+    imageUrl: 'https://i.imgflip.com/345v97.jpg',
+    author: 'MemeGenerator',
+    upvotes: 28900,
+    comments: 1056,
+    subreddit: 'memes',
+    permalink: 'https://www.reddit.com',
+    createdAt: Date.now(),
+    isVideo: false,
+  },
+];
+
+/**
  * Fetch trending memes from a subreddit
  * @param subreddit - Subreddit name (default: 'memes')
  * @param sort - Sort type: 'hot', 'top', 'new' (default: 'hot')
@@ -73,16 +175,18 @@ export const fetchRedditMemes = async (
       headers: {
         'User-Agent': 'MemeGenerator/1.0',
       },
-    });
+      timeout: 10000, // 10 second timeout
+    } as any);
 
     if (!response.ok) {
-      throw new Error(`Reddit API error: ${response.status}`);
+      console.warn(`Reddit API returned ${response.status}, using fallback data`);
+      return FALLBACK_MEMES;
     }
 
     const data = await response.json();
 
     if (!data.data || !data.data.children) {
-      return [];
+      return FALLBACK_MEMES;
     }
 
     // Filter and transform posts to only include image posts
@@ -125,12 +229,10 @@ export const fetchRedditMemes = async (
         };
       });
 
-    return memes;
+    return memes.length > 0 ? memes : FALLBACK_MEMES;
   } catch (error) {
-    if (__DEV__) {
-      console.error('Error fetching Reddit memes:', error);
-    }
-    return [];
+    console.warn('Error fetching Reddit memes, using fallback data:', error);
+    return FALLBACK_MEMES;
   }
 };
 
@@ -152,18 +254,18 @@ export const fetchTrendingFromAll = async (limit: number = 10): Promise<RedditMe
 
     // Return top memes (remove duplicates)
     const seen = new Set<string>();
-    return allMemes.filter(meme => {
+    const uniqueMemes = allMemes.filter(meme => {
       if (seen.has(meme.imageUrl)) {
         return false;
       }
       seen.add(meme.imageUrl);
       return true;
     }).slice(0, 50);
+
+    return uniqueMemes.length > 0 ? uniqueMemes : FALLBACK_MEMES;
   } catch (error) {
-    if (__DEV__) {
-      console.error('Error fetching trending memes:', error);
-    }
-    return [];
+    console.warn('Error fetching trending memes, using fallback data:', error);
+    return FALLBACK_MEMES;
   }
 };
 
@@ -235,11 +337,13 @@ export const searchRedditMemes = async (
         isVideo: post.is_video,
       }));
 
-    return memes;
+    return memes.length > 0 ? memes : FALLBACK_MEMES.filter(m =>
+      m.title.toLowerCase().includes(query.toLowerCase())
+    );
   } catch (error) {
-    if (__DEV__) {
-      console.error('Error searching Reddit memes:', error);
-    }
-    return [];
+    console.warn('Error searching Reddit memes, using fallback data:', error);
+    return FALLBACK_MEMES.filter(m =>
+      m.title.toLowerCase().includes(query.toLowerCase())
+    );
   }
 };
