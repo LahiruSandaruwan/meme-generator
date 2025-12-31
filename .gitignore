@@ -72,6 +72,8 @@ web-build/
 
 # Sensitive keys and credentials
 google-play-service-account.json
+google-services.json
+GoogleService-Info.plist
 *.p12
 *.mobileprovision
 credentials.json
