@@ -1,3 +1,5 @@
+import { AdvancedEffect } from '../utils/advancedTextEffects';
+
 export interface MemeTemplate {
   id: string;
   name: string;
@@ -19,7 +21,7 @@ export interface MemeText {
   strokeWidth: number;
   fontFamily?: string;
   rotation?: number;
-  effect?: 'none' | 'shadow' | '3d' | 'gradient' | 'glow';
+  effect?: AdvancedEffect;
   shadowOpacity?: number;
   gradientColors?: string[];
 }

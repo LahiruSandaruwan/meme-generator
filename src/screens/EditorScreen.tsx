@@ -43,7 +43,7 @@ import { DrawingPath, DrawingSettings, DEFAULT_DRAWING_SETTINGS } from '../utils
 import { shareToAny, getSuggestedHashtags } from '../utils/socialShare';
 import { adManager } from '../utils/adManager';
 import { premiumManager } from '../utils/premiumManager';
-import { optimizeImageForExport } from '../utils/imageOptimization';
+import { optimizeImage } from '../utils/imageOptimization';
 
 const { width } = Dimensions.get('window');
 const MEME_WIDTH = width - 32;
@@ -113,7 +113,7 @@ const EditorScreen: React.FC<EditorScreenProps> = ({ navigation, route }) => {
   // Check premium status on mount
   React.useEffect(() => {
     const checkPremium = async () => {
-      const status = await premiumManager.getPremiumStatus();
+      const status = await premiumManager.getStatus();
       setIsPremium(status.isPremium);
     };
     checkPremium();
@@ -282,7 +282,7 @@ const EditorScreen: React.FC<EditorScreenProps> = ({ navigation, route }) => {
 
       // Apply the effect type if available
       if (style.effect) {
-        updates.effect = style.effect === 'none' ? 'none' : 'shadow'; // Map to existing effects
+        updates.effect = style.effect;
       }
 
       updateTextBox(selectedTextId, updates);
@@ -311,7 +311,7 @@ const EditorScreen: React.FC<EditorScreenProps> = ({ navigation, route }) => {
       const uri = await viewShotRef.current.capture();
 
       // Optimize the image for social media sharing
-      const optimizedUri = await optimizeImageForExport(uri, 'social');
+      const optimizedUri = await optimizeImage(uri, { maxWidth: 1080, quality: 0.9 });
 
       // Save to gallery
       await saveImageToGallery(optimizedUri);
@@ -748,10 +748,10 @@ const EditorScreen: React.FC<EditorScreenProps> = ({ navigation, route }) => {
               </View>
               <View style={styles.effectPicker}>
                 {[
-                  { value: 'none', label: 'None', icon: 'text-outline' },
-                  { value: 'shadow', label: 'Shadow', icon: 'copy-outline' },
-                  { value: '3d', label: '3D', icon: 'cube-outline' },
-                  { value: 'glow', label: 'Glow', icon: 'sparkles-outline' },
+                  { value: 'none' as const, label: 'None', icon: 'text-outline' },
+                  { value: 'neon-blue' as const, label: 'Shadow', icon: 'copy-outline' },
+                  { value: 'comic-book' as const, label: '3D', icon: 'cube-outline' },
+                  { value: 'neon-pink' as const, label: 'Glow', icon: 'sparkles-outline' },
                 ].map((effect) => (
                   <TouchableOpacity
                     key={effect.value}
@@ -768,7 +768,7 @@ const EditorScreen: React.FC<EditorScreenProps> = ({ navigation, route }) => {
                         );
                         return;
                       }
-                      updateTextBox(selectedText.id, { effect: effect.value as any });
+                      updateTextBox(selectedText.id, { effect: effect.value });
                     }}
                   >
                     <Ionicons
@@ -1089,27 +1089,57 @@ const DraggableText: React.FC<DraggableTextProps> = ({
       fontFamily: textBox.fontFamily || undefined,
     };
 
+    // Handle neon effects
+    if (effect.startsWith('neon-')) {
+      return {
+        ...baseStyle,
+        textShadowColor: textBox.color,
+        textShadowOffset: { width: 0, height: 0 },
+        textShadowRadius: 15,
+      };
+    }
+
+    // Handle gradient effects (use first gradient color if available)
+    if (effect.startsWith('gradient-') || ['chrome', 'metal', 'retro-70s'].includes(effect)) {
+      return {
+        ...baseStyle,
+        textShadowColor: textBox.strokeColor || '#000000',
+        textShadowOffset: { width: 2, height: 2 },
+        textShadowRadius: 4,
+      };
+    }
+
+    // Handle special effects
     switch (effect) {
-      case 'shadow':
+      case 'comic-book':
         return {
           ...baseStyle,
           textShadowColor: '#000000',
-          textShadowOffset: { width: 3, height: 3 },
-          textShadowRadius: 6,
+          textShadowOffset: { width: 4, height: 4 },
+          textShadowRadius: 0,
         };
-      case '3d':
+      case 'glitch':
         return {
           ...baseStyle,
-          textShadowColor: textBox.strokeColor || '#000000',
-          textShadowOffset: { width: 4, height: 4 },
-          textShadowRadius: 2,
+          textShadowColor: '#00FFFF',
+          textShadowOffset: { width: 3, height: -2 },
+          textShadowRadius: 0,
         };
-      case 'glow':
+      case 'retro-80s':
+      case 'retro-vhs':
         return {
           ...baseStyle,
           textShadowColor: textBox.color,
-          textShadowOffset: { width: 0, height: 0 },
-          textShadowRadius: 10,
+          textShadowOffset: { width: 4, height: 4 },
+          textShadowRadius: 0,
+        };
+      case 'wood':
+      case 'metal':
+        return {
+          ...baseStyle,
+          textShadowColor: '#000000',
+          textShadowOffset: { width: 2, height: 2 },
+          textShadowRadius: 2,
         };
       default:
         return {
@@ -1497,6 +1527,15 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     marginTop: 16,
+  },
+  premiumBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: `${colors.warning}20`,
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 12,
+    gap: 4,
   },
   effectPicker: {
     flexDirection: 'row',
