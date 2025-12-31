@@ -94,6 +94,10 @@ const SettingsScreen: React.FC = () => {
     navigation.navigate('PrivacyPolicy');
   };
 
+  const handleTermsOfService = () => {
+    navigation.navigate('TermsOfService');
+  };
+
   const handleClearCache = () => {
     Alert.alert(
       'Clear Cache',
@@ -199,6 +203,13 @@ const SettingsScreen: React.FC = () => {
               subtitle="How we protect your data"
               onPress={handlePrivacyPolicy}
               iconColor={colors.success}
+            />
+            <SettingItem
+              icon="document-text"
+              title="Terms of Service"
+              subtitle="App usage terms and conditions"
+              onPress={handleTermsOfService}
+              iconColor="#4A90E2"
             />
           </View>
         </View>

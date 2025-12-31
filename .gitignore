@@ -65,10 +65,16 @@ web-build/
 .tmp/
 *.log
 
-# Environment
+# Environment variables (keep .env.example and .env.development for reference)
 .env
 .env.local
 .env.production
+
+# Sensitive keys and credentials
+google-play-service-account.json
+*.p12
+*.mobileprovision
+credentials.json
 
 # Testing
 coverage/

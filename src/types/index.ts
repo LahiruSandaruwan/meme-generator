@@ -69,6 +69,7 @@ export type RootStackParamList = {
   CollageEditor: undefined;
   GifEditor: undefined;
   PrivacyPolicy: undefined;
+  TermsOfService: undefined;
   Premium: undefined;
   Trending: undefined;
 };

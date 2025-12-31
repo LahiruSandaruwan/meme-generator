@@ -1,0 +1,74 @@
+name: EAS Build
+
+on:
+  workflow_dispatch:
+    inputs:
+      platform:
+        description: 'Platform to build'
+        required: true
+        type: choice
+        options:
+          - ios
+          - android
+          - all
+      profile:
+        description: 'Build profile'
+        required: true
+        type: choice
+        options:
+          - development
+          - preview
+          - production
+
+jobs:
+  build:
+    name: EAS Build - ${{ inputs.platform }} (${{ inputs.profile }})
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Setup Expo and EAS
+        uses: expo/expo-github-action@v8
+        with:
+          eas-version: latest
+          token: ${{ secrets.EXPO_TOKEN }}
+
+      - name: Install dependencies
+        run: npm ci --legacy-peer-deps
+
+      - name: Run tests before build
+        run: npm test
+
+      - name: Build for iOS
+        if: inputs.platform == 'ios' || inputs.platform == 'all'
+        run: eas build --platform ios --profile ${{ inputs.profile }} --non-interactive
+        env:
+          APP_ENV: ${{ inputs.profile == 'production' && 'production' || 'development' }}
+
+      - name: Build for Android
+        if: inputs.platform == 'android' || inputs.platform == 'all'
+        run: eas build --platform android --profile ${{ inputs.profile }} --non-interactive
+        env:
+          APP_ENV: ${{ inputs.profile == 'production' && 'production' || 'development' }}
+
+      - name: Notify build completion
+        if: success()
+        run: |
+          echo "✅ EAS Build completed successfully!"
+          echo "Platform: ${{ inputs.platform }}"
+          echo "Profile: ${{ inputs.profile }}"
+
+      - name: Notify build failure
+        if: failure()
+        run: |
+          echo "❌ EAS Build failed!"
+          echo "Platform: ${{ inputs.platform }}"
+          echo "Profile: ${{ inputs.profile }}"

@@ -7,6 +7,8 @@ import AppNavigator from './src/navigation/AppNavigator';
 import { getOnboardingCompleted } from './src/utils/storage';
 import { adManager } from './src/utils/adManager';
 import { colors } from './src/constants/colors';
+import ErrorBoundary from './src/components/ErrorBoundary';
+import { initializeErrorTracking } from './src/services/errorTracking';
 
 export default function App() {
   const [isReady, setIsReady] = useState(false);
@@ -18,6 +20,9 @@ export default function App() {
 
   const initializeApp = async () => {
     try {
+      // Initialize error tracking first
+      initializeErrorTracking();
+
       // Check if onboarding is completed
       const onboardingCompleted = await getOnboardingCompleted();
       setInitialRoute(onboardingCompleted ? 'MainTabs' : 'Onboarding');
@@ -45,12 +50,14 @@ export default function App() {
   }
 
   return (
-    <SafeAreaProvider>
-      <PaperProvider>
-        <StatusBar style="dark" />
-        <AppNavigator />
-      </PaperProvider>
-    </SafeAreaProvider>
+    <ErrorBoundary>
+      <SafeAreaProvider>
+        <PaperProvider>
+          <StatusBar style="dark" />
+          <AppNavigator />
+        </PaperProvider>
+      </SafeAreaProvider>
+    </ErrorBoundary>
   );
 }
 

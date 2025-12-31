@@ -1,0 +1,36 @@
+# Dependencies
+node_modules/
+
+# Expo
+.expo/
+.expo-shared/
+dist/
+web-build/
+
+# Native
+android/
+ios/
+
+# Build artifacts
+*.jsbundle
+build/
+
+# Cache
+.cache/
+*.cache
+
+# Logs
+*.log
+
+# Environment
+.env
+.env.local
+.env.production
+
+# Generated files
+coverage/
+.expo-shared/
+
+# Lock files
+package-lock.json
+yarn.lock

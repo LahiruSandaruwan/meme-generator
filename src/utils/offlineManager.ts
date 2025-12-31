@@ -4,7 +4,8 @@
  * 100% FREE - Uses React Native NetInfo
  */
 
-import NetInfo, { NetInfoState } from '@react-native-community/netinfo';
+// Using stub implementation until NetInfo is properly configured
+// import NetInfo, { NetInfoState } from '@react-native-community/netinfo';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const OFFLINE_QUEUE_KEY = '@offline_queue';
@@ -31,8 +32,10 @@ export interface CachedTemplate {
  */
 export const isOnline = async (): Promise<boolean> => {
   try {
-    const state = await NetInfo.fetch();
-    return state.isConnected === true && state.isInternetReachable === true;
+    // Stub: Always return true until NetInfo is properly configured
+    // const state = await NetInfo.fetch();
+    // return state.isConnected === true && state.isInternetReachable === true;
+    return true;
   } catch (error) {
     // If we can't determine, assume online to not block functionality
     return true;
@@ -45,18 +48,22 @@ export const isOnline = async (): Promise<boolean> => {
 export const subscribeToNetworkStatus = (
   callback: (isOnline: boolean) => void
 ): (() => void) => {
-  const unsubscribe = NetInfo.addEventListener((state: NetInfoState) => {
-    const online = state.isConnected === true && state.isInternetReachable === true;
-    callback(online);
+  // Stub: Always call callback with true until NetInfo is properly configured
+  // const unsubscribe = NetInfo.addEventListener((state: NetInfoState) => {
+  //   const online = state.isConnected === true && state.isInternetReachable === true;
+  //   callback(online);
+  callback(true);
 
-    // Save current state
-    AsyncStorage.setItem(NETWORK_STATE_KEY, JSON.stringify({
-      isOnline: online,
-      timestamp: Date.now(),
-    })).catch(() => {});
-  });
+  // Save current state
+  AsyncStorage.setItem(NETWORK_STATE_KEY, JSON.stringify({
+    isOnline: true,
+    timestamp: Date.now(),
+  })).catch(() => {});
 
-  return unsubscribe;
+  // Return no-op unsubscribe function
+  return () => {};
+  // Original code: });
+  // return unsubscribe;
 };
 
 /**
@@ -68,11 +75,12 @@ export const getNetworkState = async (): Promise<{
   isInternetReachable: boolean | null;
 }> => {
   try {
-    const state = await NetInfo.fetch();
+    // Stub: Always return online until NetInfo is properly configured
+    // const state = await NetInfo.fetch();
     return {
-      isOnline: state.isConnected === true && state.isInternetReachable === true,
-      type: state.type,
-      isInternetReachable: state.isInternetReachable,
+      isOnline: true,
+      type: 'wifi',
+      isInternetReachable: true,
     };
   } catch (error) {
     return {

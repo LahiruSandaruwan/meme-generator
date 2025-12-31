@@ -17,6 +17,7 @@ import GifEditorScreen from '../screens/GifEditorScreen';
 import GalleryScreen from '../screens/GalleryScreen';
 import SettingsScreen from '../screens/SettingsScreen';
 import PrivacyPolicyScreen from '../screens/PrivacyPolicyScreen';
+import TermsOfServiceScreen from '../screens/TermsOfServiceScreen';
 import PremiumScreen from '../screens/PremiumScreen';
 import { TrendingScreen } from '../screens/TrendingScreen';
 
@@ -159,6 +160,14 @@ export default function AppNavigator() {
           component={PrivacyPolicyScreen}
           options={{
             title: 'Privacy Policy',
+            presentation: 'modal',
+          }}
+        />
+        <Stack.Screen
+          name="TermsOfService"
+          component={TermsOfServiceScreen}
+          options={{
+            title: 'Terms of Service',
             presentation: 'modal',
           }}
         />
