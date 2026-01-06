@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import {
   TouchableOpacity,
   Image,
@@ -28,17 +28,47 @@ export const MemeTemplate: React.FC<MemeTemplateProps> = ({
   const isTrending = template.category === 'Trending';
   const [isLoading, setIsLoading] = useState(true);
   const [hasError, setHasError] = useState(false);
+  const loadTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Clean up timeout on unmount
+  useEffect(() => {
+    return () => {
+      if (loadTimeoutRef.current) {
+        clearTimeout(loadTimeoutRef.current);
+      }
+    };
+  }, []);
 
   const handleLoadStart = () => {
     setIsLoading(true);
     setHasError(false);
+
+    // Clear any existing timeout
+    if (loadTimeoutRef.current) {
+      clearTimeout(loadTimeoutRef.current);
+    }
+
+    // Set timeout for image loading (10 seconds)
+    loadTimeoutRef.current = setTimeout(() => {
+      setIsLoading(false);
+      setHasError(true);
+      if (__DEV__) {
+        console.warn(`Timeout loading template: ${template.name} (${template.url})`);
+      }
+    }, 10000);
   };
 
   const handleLoadEnd = () => {
+    if (loadTimeoutRef.current) {
+      clearTimeout(loadTimeoutRef.current);
+    }
     setIsLoading(false);
   };
 
   const handleError = () => {
+    if (loadTimeoutRef.current) {
+      clearTimeout(loadTimeoutRef.current);
+    }
     setIsLoading(false);
     setHasError(true);
     if (__DEV__) {

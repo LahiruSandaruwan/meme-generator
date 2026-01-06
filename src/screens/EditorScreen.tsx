@@ -311,15 +311,15 @@ const EditorScreen: React.FC<EditorScreenProps> = ({ navigation, route }) => {
       const uri = await viewShotRef.current.capture();
 
       // Optimize the image for social media sharing
-      const optimizedUri = await optimizeImage(uri, { maxWidth: 1080, quality: 0.9 });
+      const optimizedResult = await optimizeImage(uri, { maxWidth: 1080, quality: 0.9 });
 
       // Save to gallery
-      await saveImageToGallery(optimizedUri);
+      await saveImageToGallery(optimizedResult.uri);
 
       // Save to app storage
       const meme = {
         id: generateUniqueId(),
-        uri: optimizedUri,
+        uri: optimizedResult.uri,
         timestamp: Date.now(),
         templateId: route.params.templateId,
       };
