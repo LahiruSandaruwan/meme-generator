@@ -44,6 +44,7 @@ import { shareToAny, getSuggestedHashtags } from '../utils/socialShare';
 import { adManager } from '../utils/adManager';
 import { premiumManager } from '../utils/premiumManager';
 import { optimizeImage } from '../utils/imageOptimization';
+import { trackMemeCreation } from '../utils/memeStats';
 
 const { width } = Dimensions.get('window');
 const MEME_WIDTH = width - 32;
@@ -324,6 +325,19 @@ const EditorScreen: React.FC<EditorScreenProps> = ({ navigation, route }) => {
         templateId: route.params.templateId,
       };
       await saveMeme(meme);
+
+      // Track meme creation for stats
+      try {
+        await trackMemeCreation(
+          route.params.templateId,
+          route.params.templateName,
+          undefined, // category - we don't have this info here
+          60000 // estimate 1 minute spent
+        );
+        if (__DEV__) { console.log('Stats tracked successfully'); }
+      } catch (error) {
+        if (__DEV__) { console.error('Error tracking stats:', error); }
+      }
 
       Alert.alert(
         'Success!',

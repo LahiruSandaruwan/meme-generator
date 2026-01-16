@@ -102,6 +102,7 @@ export const DailyChallengeModal: React.FC<DailyChallengeModalProps> = ({
     if (!stats) return null;
 
     const { todayChallenge, completedToday, streak } = stats;
+    const isNewUser = streak.total === 0;
 
     return (
       <ScrollView
@@ -109,6 +110,19 @@ export const DailyChallengeModal: React.FC<DailyChallengeModalProps> = ({
         contentContainerStyle={styles.tabContentScroll}
         showsVerticalScrollIndicator={false}
       >
+        {/* Welcome Message for New Users */}
+        {isNewUser && (
+          <View style={styles.welcomeCard}>
+            <View style={styles.welcomeHeader}>
+              <Ionicons name="calendar" size={40} color="#FFD700" />
+              <Text style={styles.welcomeTitle}>Welcome to Daily Challenges!</Text>
+            </View>
+            <Text style={styles.welcomeText}>
+              Complete daily challenges to build your streak, unlock achievements, and improve your meme-making skills. Each day brings a new creative prompt!
+            </Text>
+          </View>
+        )}
+
         {/* Streak Display */}
         <View style={styles.streakCard}>
           <View style={styles.streakHeader}>
@@ -780,5 +794,30 @@ const styles = StyleSheet.create({
     color: colors.textLight,
     marginTop: 4,
     fontStyle: 'italic',
+  },
+  welcomeCard: {
+    backgroundColor: '#FFF9E6',
+    borderRadius: 16,
+    padding: 20,
+    marginBottom: 16,
+    borderWidth: 2,
+    borderColor: '#FFD700',
+  },
+  welcomeHeader: {
+    alignItems: 'center',
+    marginBottom: 12,
+  },
+  welcomeTitle: {
+    fontSize: 20,
+    fontWeight: '700',
+    color: colors.text,
+    marginTop: 8,
+    textAlign: 'center',
+  },
+  welcomeText: {
+    fontSize: 15,
+    color: colors.text,
+    lineHeight: 22,
+    textAlign: 'center',
   },
 });

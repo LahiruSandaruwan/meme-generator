@@ -17,9 +17,7 @@ import { colors } from '../constants/colors';
 import { MainTabParamList, RootStackParamList, MemeTemplate as MemeTemplateType } from '../types';
 import { memeTemplates, searchTemplates, getCategories } from '../utils/memeTemplates';
 import { MemeTemplate } from '../components/MemeTemplate';
-import { CustomButton } from '../components/CustomButton';
 import { DailyChallengeModal } from '../components/DailyChallengeModal';
-import { WhatsAppStickerModal } from '../components/WhatsAppStickerModal';
 import { MemeStatsModal } from '../components/MemeStatsModal';
 import { OfflineIndicator } from '../components/OfflineIndicator';
 
@@ -36,7 +34,6 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [showChallengeModal, setShowChallengeModal] = useState(false);
-  const [showWhatsAppModal, setShowWhatsAppModal] = useState(false);
   const [showStatsModal, setShowStatsModal] = useState(false);
 
   const categories = getCategories();
@@ -68,7 +65,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
       }
 
       const result = await ImagePicker.launchImageLibraryAsync({
-        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        mediaTypes: ['images'],
         allowsEditing: true,
         quality: 1,
       });
@@ -123,9 +120,138 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
     );
   };
 
+  const [showMoreTools, setShowMoreTools] = useState(false);
+
   const renderHeader = () => (
     <View style={styles.header}>
-      {/* 1. SEARCH - Quick access at top */}
+      {/* Hero Section - Primary Actions */}
+      <View style={styles.heroSection}>
+        <Text style={styles.heroTitle}>Create Your Meme</Text>
+        <View style={styles.quickActionsRow}>
+          <TouchableOpacity
+            style={styles.quickActionCard}
+            onPress={handleUploadCustomImage}
+            activeOpacity={0.7}
+          >
+            <View style={styles.quickActionIcon}>
+              <Ionicons name="images-outline" size={28} color={colors.primary} />
+            </View>
+            <Text style={styles.quickActionText}>Upload</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={styles.quickActionCard}
+            onPress={handleTakePhoto}
+            activeOpacity={0.7}
+          >
+            <View style={styles.quickActionIcon}>
+              <Ionicons name="camera-outline" size={28} color={colors.primary} />
+            </View>
+            <Text style={styles.quickActionText}>Camera</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={styles.quickActionCard}
+            onPress={() => navigation.navigate('Trending')}
+            activeOpacity={0.7}
+          >
+            <View style={styles.quickActionIcon}>
+              <Ionicons name="trending-up-outline" size={28} color={colors.primary} />
+            </View>
+            <Text style={styles.quickActionText}>Trending</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={styles.quickActionCard}
+            onPress={() => setShowMoreTools(!showMoreTools)}
+            activeOpacity={0.7}
+          >
+            <View style={styles.quickActionIcon}>
+              <Ionicons name="apps-outline" size={28} color={colors.primary} />
+            </View>
+            <Text style={styles.quickActionText}>More</Text>
+          </TouchableOpacity>
+        </View>
+      </View>
+
+      {/* Expandable Tools Section */}
+      {showMoreTools && (
+        <View style={styles.toolsGrid}>
+          <TouchableOpacity
+            style={styles.toolCard}
+            onPress={() => {
+              setShowMoreTools(false);
+              navigation.navigate('MultiPanelEditor');
+            }}
+            activeOpacity={0.7}
+          >
+            <Ionicons name="grid-outline" size={24} color="#9C27B0" />
+            <Text style={styles.toolCardText}>Multi-Panel</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={styles.toolCard}
+            onPress={() => {
+              setShowMoreTools(false);
+              navigation.navigate('CollageEditor');
+            }}
+            activeOpacity={0.7}
+          >
+            <Ionicons name="albums-outline" size={24} color="#FF6F00" />
+            <Text style={styles.toolCardText}>Collage</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={styles.toolCard}
+            onPress={() => {
+              setShowMoreTools(false);
+              navigation.navigate('StoryEditor', {});
+            }}
+            activeOpacity={0.7}
+          >
+            <Ionicons name="logo-instagram" size={24} color="#E1306C" />
+            <Text style={styles.toolCardText}>Story</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={styles.toolCard}
+            onPress={() => {
+              setShowMoreTools(false);
+              navigation.navigate('GifEditor');
+            }}
+            activeOpacity={0.7}
+          >
+            <Ionicons name="film-outline" size={24} color="#FF5722" />
+            <Text style={styles.toolCardText}>GIF</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={styles.toolCard}
+            onPress={() => {
+              setShowMoreTools(false);
+              setShowChallengeModal(true);
+            }}
+            activeOpacity={0.7}
+          >
+            <Ionicons name="calendar-outline" size={24} color="#FFD700" />
+            <Text style={styles.toolCardText}>Challenge</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={styles.toolCard}
+            onPress={() => {
+              setShowMoreTools(false);
+              setShowStatsModal(true);
+            }}
+            activeOpacity={0.7}
+          >
+            <Ionicons name="stats-chart-outline" size={24} color="#2196F3" />
+            <Text style={styles.toolCardText}>My Stats</Text>
+          </TouchableOpacity>
+        </View>
+      )}
+
+      {/* Search Bar */}
       <View style={styles.searchContainer}>
         <Ionicons name="search" size={20} color={colors.textLight} />
         <TextInput
@@ -142,40 +268,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
         ) : null}
       </View>
 
-      {/* 2. QUICK ACTIONS - Primary user actions */}
-      <View style={styles.uploadButtonsContainer}>
-        <CustomButton
-          title="Upload Photo"
-          onPress={handleUploadCustomImage}
-          icon={<Ionicons name="images" size={20} color={colors.white} style={{ marginRight: 8 }} />}
-          style={styles.uploadButton}
-        />
-        <CustomButton
-          title="Take Photo"
-          onPress={handleTakePhoto}
-          variant="secondary"
-          icon={<Ionicons name="camera" size={20} color={colors.white} style={{ marginRight: 8 }} />}
-          style={styles.uploadButton}
-        />
-      </View>
-
-      {/* 3. TRENDING - Discovery/Inspiration */}
-      <TouchableOpacity
-        style={styles.trendingButton}
-        onPress={() => navigation.navigate('Trending')}
-        activeOpacity={0.8}
-      >
-        <View style={styles.trendingContent}>
-          <Ionicons name="trending-up" size={24} color="#FF4500" />
-          <View style={styles.trendingTextContainer}>
-            <Text style={styles.trendingTitle}>Trending from Reddit</Text>
-            <Text style={styles.trendingSubtitle}>Get inspired by popular memes 🔥</Text>
-          </View>
-        </View>
-        <Ionicons name="chevron-forward" size={24} color={colors.textLight} />
-      </TouchableOpacity>
-
-      {/* 4. CATEGORY FILTER - After primary actions */}
+      {/* Category Filter */}
       <View style={styles.categoryContainer}>
         <FlatList
           horizontal
@@ -203,133 +296,9 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
         />
       </View>
 
-      {/* SECTION: CREATIVE TOOLS */}
-      <View style={styles.sectionHeader}>
-        <Ionicons name="color-wand" size={18} color={colors.primary} />
-        <Text style={styles.sectionHeaderText}>Creative Tools</Text>
-      </View>
-
-      {/* Multi-Panel Creator */}
-      <TouchableOpacity
-        style={styles.multiPanelButton}
-        onPress={() => navigation.navigate('MultiPanelEditor')}
-        activeOpacity={0.8}
-      >
-        <View style={styles.multiPanelContent}>
-          <Ionicons name="grid" size={24} color="#9C27B0" />
-          <View style={styles.multiPanelTextContainer}>
-            <Text style={styles.multiPanelTitle}>Multi-Panel Memes</Text>
-            <Text style={styles.multiPanelSubtitle}>Create 2x2, 3x1 grids & more! ✨</Text>
-          </View>
-        </View>
-        <Ionicons name="chevron-forward" size={24} color={colors.textLight} />
-      </TouchableOpacity>
-
-      {/* Collage Maker */}
-      <TouchableOpacity
-        style={styles.collageButton}
-        onPress={() => navigation.navigate('CollageEditor')}
-        activeOpacity={0.8}
-      >
-        <View style={styles.collageContent}>
-          <Ionicons name="albums" size={24} color="#FF6F00" />
-          <View style={styles.collageTextContainer}>
-            <Text style={styles.collageTitle}>Collage Maker</Text>
-            <Text style={styles.collageSubtitle}>Combine multiple memes in one! 🖼️</Text>
-          </View>
-        </View>
-        <Ionicons name="chevron-forward" size={24} color={colors.textLight} />
-      </TouchableOpacity>
-
-      {/* Instagram Story */}
-      <TouchableOpacity
-        style={styles.storyButton}
-        onPress={() => navigation.navigate('StoryEditor', {})}
-        activeOpacity={0.8}
-      >
-        <View style={styles.storyContent}>
-          <Ionicons name="logo-instagram" size={24} color="#E1306C" />
-          <View style={styles.storyTextContainer}>
-            <Text style={styles.storyTitle}>Instagram Stories</Text>
-            <Text style={styles.storySubtitle}>Perfect 9:16 format! 📱</Text>
-          </View>
-        </View>
-        <Ionicons name="chevron-forward" size={24} color={colors.textLight} />
-      </TouchableOpacity>
-
-      {/* WhatsApp Stickers */}
-      <TouchableOpacity
-        style={styles.whatsappButton}
-        onPress={() => setShowWhatsAppModal(true)}
-        activeOpacity={0.8}
-      >
-        <View style={styles.whatsappContent}>
-          <Ionicons name="logo-whatsapp" size={24} color="#25D366" />
-          <View style={styles.whatsappTextContainer}>
-            <Text style={styles.whatsappTitle}>WhatsApp Stickers</Text>
-            <Text style={styles.whatsappSubtitle}>Convert to viral sticker packs! 💬</Text>
-          </View>
-        </View>
-        <Ionicons name="chevron-forward" size={24} color={colors.textLight} />
-      </TouchableOpacity>
-
-      {/* GIF Editor */}
-      <TouchableOpacity
-        style={styles.gifButton}
-        onPress={() => navigation.navigate('GifEditor')}
-        activeOpacity={0.8}
-      >
-        <View style={styles.gifContent}>
-          <Ionicons name="film" size={24} color="#FF5722" />
-          <View style={styles.gifTextContainer}>
-            <Text style={styles.gifTitle}>GIF Support</Text>
-            <Text style={styles.gifSubtitle}>Import & edit animated GIFs! 🎬</Text>
-          </View>
-        </View>
-        <Ionicons name="chevron-forward" size={24} color={colors.textLight} />
-      </TouchableOpacity>
-
-      {/* SECTION: YOUR PROGRESS */}
-      <View style={styles.sectionHeader}>
-        <Ionicons name="trophy" size={18} color={colors.warning} />
-        <Text style={styles.sectionHeaderText}>Your Progress</Text>
-      </View>
-
-      {/* Daily Challenge */}
-      <TouchableOpacity
-        style={styles.challengeButton}
-        onPress={() => setShowChallengeModal(true)}
-        activeOpacity={0.8}
-      >
-        <View style={styles.challengeContent}>
-          <Ionicons name="calendar" size={24} color="#FFD700" />
-          <View style={styles.challengeTextContainer}>
-            <Text style={styles.challengeTitle}>Daily Meme Challenge</Text>
-            <Text style={styles.challengeSubtitle}>New creative prompt every day! ⭐</Text>
-          </View>
-        </View>
-        <Ionicons name="chevron-forward" size={24} color={colors.textLight} />
-      </TouchableOpacity>
-
-      {/* My Stats */}
-      <TouchableOpacity
-        style={styles.statsButton}
-        onPress={() => setShowStatsModal(true)}
-        activeOpacity={0.8}
-      >
-        <View style={styles.statsContent}>
-          <Ionicons name="stats-chart" size={24} color="#2196F3" />
-          <View style={styles.statsTextContainer}>
-            <Text style={styles.statsTitle}>My Stats</Text>
-            <Text style={styles.statsSubtitle}>Track your meme creation journey 📊</Text>
-          </View>
-        </View>
-        <Ionicons name="chevron-forward" size={24} color={colors.textLight} />
-      </TouchableOpacity>
-
       {/* Template Count */}
-      <Text style={styles.sectionTitle}>
-        {filteredTemplates.length} Templates
+      <Text style={styles.templateCount}>
+        {filteredTemplates.length} templates
       </Text>
     </View>
   );
@@ -357,11 +326,6 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
         onStartChallenge={handleStartChallenge}
       />
 
-      <WhatsAppStickerModal
-        visible={showWhatsAppModal}
-        onClose={() => setShowWhatsAppModal(false)}
-      />
-
       <MemeStatsModal
         visible={showStatsModal}
         onClose={() => setShowStatsModal(false)}
@@ -376,8 +340,88 @@ const styles = StyleSheet.create({
     backgroundColor: colors.background,
   },
   header: {
+    paddingTop: 8,
+  },
+  heroSection: {
     paddingHorizontal: 16,
-    paddingTop: 16,
+    paddingVertical: 20,
+    backgroundColor: colors.white,
+    borderBottomLeftRadius: 24,
+    borderBottomRightRadius: 24,
+    shadowColor: colors.shadow,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.08,
+    shadowRadius: 8,
+    elevation: 4,
+  },
+  heroTitle: {
+    fontSize: 28,
+    fontWeight: '700',
+    color: colors.text,
+    marginBottom: 20,
+  },
+  quickActionsRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    gap: 12,
+  },
+  quickActionCard: {
+    flex: 1,
+    alignItems: 'center',
+    backgroundColor: colors.background,
+    borderRadius: 16,
+    paddingVertical: 16,
+    paddingHorizontal: 8,
+  },
+  quickActionIcon: {
+    width: 56,
+    height: 56,
+    borderRadius: 28,
+    backgroundColor: colors.white,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 8,
+    shadowColor: colors.primary,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 2,
+  },
+  quickActionText: {
+    fontSize: 13,
+    fontWeight: '600',
+    color: colors.text,
+  },
+  toolsGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    paddingHorizontal: 16,
+    paddingVertical: 16,
+    gap: 12,
+    backgroundColor: colors.white,
+    marginHorizontal: 16,
+    marginTop: 12,
+    borderRadius: 16,
+    shadowColor: colors.shadow,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.06,
+    shadowRadius: 6,
+    elevation: 2,
+  },
+  toolCard: {
+    width: '22%',
+    aspectRatio: 1,
+    backgroundColor: colors.background,
+    borderRadius: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 6,
+  },
+  toolCardText: {
+    fontSize: 11,
+    fontWeight: '600',
+    color: colors.text,
+    textAlign: 'center',
   },
   searchContainer: {
     flexDirection: 'row',
@@ -386,10 +430,12 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     paddingHorizontal: 16,
     paddingVertical: 12,
-    marginBottom: 16,
+    marginHorizontal: 16,
+    marginTop: 16,
+    marginBottom: 12,
     shadowColor: colors.shadow,
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
+    shadowOpacity: 0.06,
     shadowRadius: 4,
     elevation: 2,
   },
@@ -400,20 +446,26 @@ const styles = StyleSheet.create({
     color: colors.text,
   },
   categoryContainer: {
-    marginBottom: 16,
+    marginBottom: 12,
+    paddingHorizontal: 16,
   },
   categoryChip: {
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    borderRadius: 20,
+    paddingHorizontal: 20,
+    paddingVertical: 10,
+    borderRadius: 24,
     backgroundColor: colors.white,
     marginRight: 8,
-    borderWidth: 1,
-    borderColor: colors.border,
+    shadowColor: colors.shadow,
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.05,
+    shadowRadius: 3,
+    elevation: 1,
   },
   categoryChipActive: {
     backgroundColor: colors.primary,
-    borderColor: colors.primary,
+    shadowColor: colors.primary,
+    shadowOpacity: 0.3,
+    elevation: 3,
   },
   categoryText: {
     fontSize: 14,
@@ -423,318 +475,13 @@ const styles = StyleSheet.create({
   categoryTextActive: {
     color: colors.white,
   },
-  uploadButtonsContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginBottom: 16,
-    gap: 12,
-  },
-  uploadButton: {
-    flex: 1,
-  },
-  challengeButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    backgroundColor: '#FFF9E6',
-    borderRadius: 12,
-    padding: 16,
-    marginBottom: 16,
-    borderWidth: 2,
-    borderColor: '#FFD700',
-    shadowColor: '#FFD700',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.2,
-    shadowRadius: 4,
-    elevation: 3,
-  },
-  challengeContent: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 12,
-    flex: 1,
-  },
-  challengeTextContainer: {
-    flex: 1,
-  },
-  challengeTitle: {
-    fontSize: 16,
-    fontWeight: '700',
-    color: colors.text,
-    marginBottom: 4,
-  },
-  challengeSubtitle: {
-    fontSize: 13,
+  templateCount: {
+    fontSize: 15,
+    fontWeight: '600',
     color: colors.textLight,
-  },
-  multiPanelButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    backgroundColor: '#F3E5F5',
-    borderRadius: 12,
-    padding: 16,
-    marginBottom: 16,
-    borderWidth: 2,
-    borderColor: '#9C27B0',
-    shadowColor: '#9C27B0',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.2,
-    shadowRadius: 4,
-    elevation: 3,
-  },
-  multiPanelContent: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 12,
-    flex: 1,
-  },
-  multiPanelTextContainer: {
-    flex: 1,
-  },
-  multiPanelTitle: {
-    fontSize: 16,
-    fontWeight: '700',
-    color: colors.text,
-    marginBottom: 4,
-  },
-  multiPanelSubtitle: {
-    fontSize: 13,
-    color: colors.textLight,
-  },
-  collageButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    backgroundColor: '#FFF3E0',
-    borderRadius: 12,
-    padding: 16,
-    marginBottom: 16,
-    borderWidth: 2,
-    borderColor: '#FF6F00',
-    shadowColor: '#FF6F00',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.2,
-    shadowRadius: 4,
-    elevation: 3,
-  },
-  collageContent: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 12,
-    flex: 1,
-  },
-  collageTextContainer: {
-    flex: 1,
-  },
-  collageTitle: {
-    fontSize: 16,
-    fontWeight: '700',
-    color: colors.text,
-    marginBottom: 4,
-  },
-  collageSubtitle: {
-    fontSize: 13,
-    color: colors.textLight,
-  },
-  storyButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    backgroundColor: '#FCE4EC',
-    borderRadius: 12,
-    padding: 16,
-    marginBottom: 16,
-    borderWidth: 2,
-    borderColor: '#E1306C',
-    shadowColor: '#E1306C',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.2,
-    shadowRadius: 4,
-    elevation: 3,
-  },
-  storyContent: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 12,
-    flex: 1,
-  },
-  storyTextContainer: {
-    flex: 1,
-  },
-  storyTitle: {
-    fontSize: 16,
-    fontWeight: '700',
-    color: colors.text,
-    marginBottom: 4,
-  },
-  storySubtitle: {
-    fontSize: 13,
-    color: colors.textLight,
-  },
-  whatsappButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    backgroundColor: '#E8F5E9',
-    borderRadius: 12,
-    padding: 16,
-    marginBottom: 16,
-    borderWidth: 2,
-    borderColor: '#25D366',
-    shadowColor: '#25D366',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.2,
-    shadowRadius: 4,
-    elevation: 3,
-  },
-  whatsappContent: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 12,
-    flex: 1,
-  },
-  whatsappTextContainer: {
-    flex: 1,
-  },
-  whatsappTitle: {
-    fontSize: 16,
-    fontWeight: '700',
-    color: colors.text,
-    marginBottom: 4,
-  },
-  whatsappSubtitle: {
-    fontSize: 13,
-    color: colors.textLight,
-  },
-  gifButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    backgroundColor: '#FFEBEE',
-    borderRadius: 12,
-    padding: 16,
-    marginBottom: 16,
-    borderWidth: 2,
-    borderColor: '#FF5722',
-    shadowColor: '#FF5722',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.2,
-    shadowRadius: 4,
-    elevation: 3,
-  },
-  gifContent: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 12,
-    flex: 1,
-  },
-  gifTextContainer: {
-    flex: 1,
-  },
-  gifTitle: {
-    fontSize: 16,
-    fontWeight: '700',
-    color: colors.text,
-    marginBottom: 4,
-  },
-  gifSubtitle: {
-    fontSize: 13,
-    color: colors.textLight,
-  },
-  trendingButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    backgroundColor: colors.white,
-    borderRadius: 12,
-    padding: 16,
-    marginBottom: 16,
-    borderWidth: 2,
-    borderColor: '#FF4500',
-    shadowColor: '#FF4500',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.2,
-    shadowRadius: 4,
-    elevation: 3,
-  },
-  trendingContent: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 12,
-    flex: 1,
-  },
-  trendingTextContainer: {
-    flex: 1,
-  },
-  trendingTitle: {
-    fontSize: 16,
-    fontWeight: '700',
-    color: colors.text,
-    marginBottom: 4,
-  },
-  trendingSubtitle: {
-    fontSize: 13,
-    color: colors.textLight,
-  },
-  sectionHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-    marginTop: 8,
     marginBottom: 12,
-    paddingTop: 8,
-    borderTopWidth: 1,
-    borderTopColor: colors.border,
-  },
-  sectionHeaderText: {
-    fontSize: 14,
-    fontWeight: '700',
-    color: colors.text,
-    textTransform: 'uppercase',
-    letterSpacing: 0.5,
-  },
-  statsButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    backgroundColor: '#E3F2FD',
-    borderRadius: 12,
-    padding: 16,
-    marginBottom: 16,
-    borderWidth: 2,
-    borderColor: '#2196F3',
-    shadowColor: '#2196F3',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.2,
-    shadowRadius: 4,
-    elevation: 3,
-  },
-  statsContent: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 12,
-    flex: 1,
-  },
-  statsTextContainer: {
-    flex: 1,
-  },
-  statsTitle: {
-    fontSize: 16,
-    fontWeight: '700',
-    color: colors.text,
-    marginBottom: 4,
-  },
-  statsSubtitle: {
-    fontSize: 13,
-    color: colors.textLight,
-  },
-  sectionTitle: {
-    fontSize: 18,
-    fontWeight: '700',
-    color: colors.text,
-    marginBottom: 16,
-    marginTop: 8,
+    marginTop: 4,
+    paddingHorizontal: 16,
   },
   listContent: {
     paddingHorizontal: 16,

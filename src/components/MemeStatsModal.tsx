@@ -56,6 +56,7 @@ export const MemeStatsModal: React.FC<MemeStatsModalProps> = ({
   const level = getLevel(stats.totalMemesCreated);
   const unlockedMilestones = milestones.filter(m => m.unlocked);
   const lockedMilestones = milestones.filter(m => !m.unlocked);
+  const isNewUser = stats.totalMemesCreated === 0;
 
   return (
     <Modal
@@ -82,6 +83,33 @@ export const MemeStatsModal: React.FC<MemeStatsModalProps> = ({
             contentContainerStyle={styles.scrollContent}
             showsVerticalScrollIndicator={false}
           >
+            {/* Welcome Message for New Users */}
+            {isNewUser && (
+              <View style={styles.welcomeCard}>
+                <View style={styles.welcomeHeader}>
+                  <Ionicons name="rocket" size={40} color={colors.primary} />
+                  <Text style={styles.welcomeTitle}>Welcome to Your Meme Journey!</Text>
+                </View>
+                <Text style={styles.welcomeText}>
+                  Start creating memes to unlock achievements, track your progress, and level up your meme-making skills!
+                </Text>
+                <View style={styles.welcomeFeatures}>
+                  <View style={styles.welcomeFeatureItem}>
+                    <Ionicons name="trophy" size={20} color="#FFD700" />
+                    <Text style={styles.welcomeFeatureText}>12 Achievements to unlock</Text>
+                  </View>
+                  <View style={styles.welcomeFeatureItem}>
+                    <Ionicons name="trending-up" size={20} color="#4CAF50" />
+                    <Text style={styles.welcomeFeatureText}>10 Levels to reach</Text>
+                  </View>
+                  <View style={styles.welcomeFeatureItem}>
+                    <Ionicons name="flame" size={20} color="#FF6B35" />
+                    <Text style={styles.welcomeFeatureText}>Build daily streaks</Text>
+                  </View>
+                </View>
+              </View>
+            )}
+
             {/* Level Card */}
             <View style={styles.levelCard}>
               <View style={styles.levelHeader}>
@@ -235,6 +263,15 @@ export const MemeStatsModal: React.FC<MemeStatsModalProps> = ({
                   <Text style={styles.sectionTitle}>
                     Milestones ({unlockedMilestones.length}/{milestones.length})
                   </Text>
+
+                  {isNewUser && (
+                    <View style={styles.milestonePreview}>
+                      <Text style={styles.milestonePreviewTitle}>Start Creating to Unlock!</Text>
+                      <Text style={styles.milestonePreviewText}>
+                        Your first meme will unlock the "First Meme" achievement. Keep creating to unlock 11 more milestones!
+                      </Text>
+                    </View>
+                  )}
 
                   {unlockedMilestones.length > 0 && (
                     <>
@@ -555,6 +592,68 @@ const styles = StyleSheet.create({
   },
   infoText: {
     fontSize: 13,
+    color: colors.textLight,
+    lineHeight: 20,
+  },
+  welcomeCard: {
+    backgroundColor: `${colors.primary}15`,
+    borderRadius: 16,
+    padding: 20,
+    marginBottom: 16,
+    borderWidth: 2,
+    borderColor: colors.primary,
+  },
+  welcomeHeader: {
+    alignItems: 'center',
+    marginBottom: 16,
+  },
+  welcomeTitle: {
+    fontSize: 22,
+    fontWeight: '700',
+    color: colors.text,
+    marginTop: 12,
+    textAlign: 'center',
+  },
+  welcomeText: {
+    fontSize: 15,
+    color: colors.text,
+    lineHeight: 22,
+    textAlign: 'center',
+    marginBottom: 20,
+  },
+  welcomeFeatures: {
+    gap: 12,
+  },
+  welcomeFeatureItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+    backgroundColor: colors.white,
+    borderRadius: 12,
+    padding: 12,
+  },
+  welcomeFeatureText: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: colors.text,
+    flex: 1,
+  },
+  milestonePreview: {
+    backgroundColor: colors.background,
+    borderRadius: 12,
+    padding: 16,
+    marginBottom: 12,
+    borderWidth: 1,
+    borderColor: colors.border,
+  },
+  milestonePreviewTitle: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: colors.text,
+    marginBottom: 8,
+  },
+  milestonePreviewText: {
+    fontSize: 14,
     color: colors.textLight,
     lineHeight: 20,
   },
